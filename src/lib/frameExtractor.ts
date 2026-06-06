@@ -3,7 +3,7 @@ export type FrameExtractorOptions = {
   duration: number
   thumbCount: number
   signal: AbortSignal
-  onFrame: (index: number, bitmap: ImageBitmap) => void
+  onFrame: (index: number, frame: HTMLVideoElement) => void
   onProgress?: (loaded: number, total: number) => void
 }
 
@@ -49,6 +49,21 @@ function waitForMetadata(
   return waitForEvent(video, 'loadedmetadata', signal)
 }
 
+function waitForCurrentFrame(
+  video: HTMLVideoElement,
+  signal: AbortSignal,
+): Promise<void> {
+  if (
+    video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
+    video.videoWidth > 0 &&
+    video.videoHeight > 0
+  ) {
+    return Promise.resolve()
+  }
+
+  return waitForEvent(video, 'loadeddata', signal)
+}
+
 function seekVideo(
   video: HTMLVideoElement,
   time: number,
@@ -62,22 +77,29 @@ function seekVideo(
   return waitForEvent(video, 'seeked', signal)
 }
 
+function getFrameSize(frame: HTMLVideoElement) {
+  return {
+    width: frame.videoWidth,
+    height: frame.videoHeight,
+  }
+}
+
 export function drawFilmstripFrame(
   ctx: CanvasRenderingContext2D,
   index: number,
-  bitmap: ImageBitmap,
+  frame: HTMLVideoElement,
   thumbWidth: number,
   thumbHeight: number,
 ) {
   const x = index * thumbWidth
-  const scale = Math.max(thumbWidth / bitmap.width, thumbHeight / bitmap.height)
-  const drawWidth = bitmap.width * scale
-  const drawHeight = bitmap.height * scale
+  const { width, height } = getFrameSize(frame)
+  const scale = Math.max(thumbWidth / width, thumbHeight / height)
+  const drawWidth = width * scale
+  const drawHeight = height * scale
   const offsetX = x + (thumbWidth - drawWidth) / 2
   const offsetY = (thumbHeight - drawHeight) / 2
 
-  ctx.drawImage(bitmap, offsetX, offsetY, drawWidth, drawHeight)
-  bitmap.close()
+  ctx.drawImage(frame, offsetX, offsetY, drawWidth, drawHeight)
 }
 
 export async function extractFrames({
@@ -101,10 +123,12 @@ export async function extractFrames({
 
   try {
     await waitForMetadata(video, signal)
+    await waitForCurrentFrame(video, signal)
 
     const safeDuration =
       Number.isFinite(duration) && duration > 0 ? duration : 0
     const count = Math.max(1, thumbCount)
+    const maxSeekTime = Math.max(0, safeDuration - 0.001)
 
     for (let index = 0; index < count; index += 1) {
       if (signal.aborted) {
@@ -112,12 +136,12 @@ export async function extractFrames({
       }
 
       const time =
-        count === 1 ? safeDuration / 2 : (index / (count - 1)) * safeDuration
+        count === 1 ? maxSeekTime / 2 : (index / (count - 1)) * maxSeekTime
 
       await seekVideo(video, time, signal)
+      await waitForCurrentFrame(video, signal)
 
-      const bitmap = await createImageBitmap(video)
-      onFrame(index, bitmap)
+      onFrame(index, video)
       onProgress?.(index + 1, count)
     }
   } finally {
