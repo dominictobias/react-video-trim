@@ -2,7 +2,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: var(--vc-handle-width, 14px);
+  width: 14px;
   touch-action: none;
   cursor: ew-resize;
   z-index: 3;
@@ -11,9 +11,9 @@
 .grip {
   position: absolute;
   inset: 0;
-  border: 3px solid var(--vc-accent, #f5c518);
+  border: 3px solid var(--vc-accent);
   border-radius: 4px;
-  background: var(--vc-accent, #f5c518);
+  background: var(--vc-accent);
 }
 
 .left .grip {
@@ -41,7 +41,7 @@
   width: 2px;
   height: 14px;
   border-radius: 1px;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--vc-handle-line-bg);
 }
 
 .left {

@@ -1,33 +1,56 @@
 .root {
   --vc-accent: #f5c518;
   --vc-toolbar-bg: #1c1f26;
-  --vc-toolbar-radius: 12px;
+  --vc-toolbar-overlay-bg: rgba(28, 31, 38, 0.46);
+  --vc-toolbar-overlay-border-color: rgba(255, 255, 255, 0.06);
+  --vc-toolbar-shadow-color: rgba(0, 0, 0, 0.32);
   --vc-track-bg: #0f1115;
-  --vc-track-height: 56px;
-  --vc-handle-width: 14px;
-  --vc-button-bg: #2a2f3a;
+  --vc-handle-gutter-bg: var(--vc-toolbar-bg);
+  --vc-handle-line-bg: rgba(0, 0, 0, 0.45);
+  --vc-button-bg: rgba(255, 255, 255, 0.1);
   --vc-button-bg-hover: #353b48;
   --vc-button-disabled-bg: #22262e;
   --vc-text: #ffffff;
   --vc-text-muted: #8b919a;
   --vc-text-disabled: #555a63;
+  --vc-error-bg: #3a1f1f;
+  --vc-error-text: #ffb4b4;
   --vc-dim-overlay: rgba(0, 0, 0, 0.55);
   --vc-playhead: #ffffff;
-  --vc-gap: 12px;
-  --vc-toolbar-padding: 10px 12px;
+  --vc-playhead-shadow-color: rgba(0, 0, 0, 0.6);
+  --vc-play-button-bg: transparent;
+  --vc-play-button-hover-bg: rgba(255, 255, 255, 0.08);
+  --vc-hover-preview-border-color: rgba(0, 0, 0, 0.3);
+  --vc-hover-preview-bg: rgba(15, 17, 21, 0.95);
+  --vc-hover-preview-shadow-color: rgba(0, 0, 0, 0.35);
+  --vc-track-time-bg: rgba(0, 0, 0, 0.72);
+  --vc-loading-bg: rgba(0, 0, 0, 0.35);
 
   display: flex;
   flex-direction: column;
-  gap: var(--vc-gap);
+  gap: 12px;
   width: 100%;
   max-width: 100%;
   color: var(--vc-text);
 }
 
+.videoStage {
+  position: relative;
+  width: 100%;
+}
+
+.toolbarOverlay {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 2;
+}
+
 .error {
   padding: 12px 16px;
   border-radius: 8px;
-  background: #3a1f1f;
-  color: #ffb4b4;
+  background: var(--vc-error-bg);
+  color: var(--vc-error-text);
   font-size: 14px;
 }

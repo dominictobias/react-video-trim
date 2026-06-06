@@ -10,24 +10,24 @@
   padding: 8px 14px;
   border: none;
   border-radius: 8px;
-  background: var(--vc-button-bg, #2a2f3a);
-  color: var(--vc-text, #ffffff);
+  background: var(--vc-button-bg);
+  color: var(--vc-text);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
 }
 
 .button:focus-visible {
-  outline: 1px solid var(--vc-accent, #f5c518);
+  outline: 1px solid var(--vc-accent);
 }
 
 .button:hover:not(:disabled) {
-  background: var(--vc-button-bg-hover, #353b48);
+  background: var(--vc-button-bg-hover);
 }
 
 .button:disabled {
-  background: var(--vc-button-disabled-bg, #22262e);
-  color: var(--vc-text-disabled, #555a63);
+  background: var(--vc-button-disabled-bg);
+  color: var(--vc-text-disabled);
   cursor: not-allowed;
 }
 

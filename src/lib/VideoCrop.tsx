@@ -132,34 +132,38 @@ export function VideoCrop({
 
   return (
     <div className={rootClassName} style={style}>
-      <VideoPlayer
-        ref={videoRef}
-        src={resolvedSrc}
-        onTogglePlay={togglePlay}
-        onError={handleVideoError}
-        onLoadedMetadata={handleVideoLoaded}
-      />
+      <div className={styles.videoStage}>
+        <VideoPlayer
+          ref={videoRef}
+          src={resolvedSrc}
+          onTogglePlay={togglePlay}
+          onError={handleVideoError}
+          onLoadedMetadata={handleVideoLoaded}
+        />
+
+        {isReady && duration > 0 ? (
+          <div className={styles.toolbarOverlay}>
+            <CropToolbar
+              src={resolvedSrc}
+              duration={duration}
+              currentTime={currentTime}
+              startTime={startTime}
+              endTime={endTime}
+              isPlaying={isPlaying}
+              canTrim={hasChanges}
+              onTogglePlay={togglePlay}
+              onSeek={seekWithinTrim}
+              onStartChange={handleStartChange}
+              onEndChange={handleEndChange}
+              onTrackWidthChange={handleTrackWidthChange}
+              onTrim={handleTrim}
+              onCancel={onCancel}
+            />
+          </div>
+        ) : null}
+      </div>
 
       {error ? <div className={styles.error}>{error}</div> : null}
-
-      {isReady && duration > 0 ? (
-        <CropToolbar
-          src={resolvedSrc}
-          duration={duration}
-          currentTime={currentTime}
-          startTime={startTime}
-          endTime={endTime}
-          isPlaying={isPlaying}
-          canTrim={hasChanges}
-          onTogglePlay={togglePlay}
-          onSeek={seekWithinTrim}
-          onStartChange={handleStartChange}
-          onEndChange={handleEndChange}
-          onTrackWidthChange={handleTrackWidthChange}
-          onTrim={handleTrim}
-          onCancel={onCancel}
-        />
-      ) : null}
     </div>
   )
 }

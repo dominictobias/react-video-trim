@@ -8,17 +8,17 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: transparent;
-  color: var(--vc-text, #ffffff);
+  background: var(--vc-play-button-bg);
+  color: var(--vc-text);
   cursor: pointer;
 }
 
 .button:focus-visible {
-  outline: 1px solid var(--vc-accent, #f5c518);
+  outline: 1px solid var(--vc-accent);
 }
 
 .button:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--vc-play-button-hover-bg);
 }
 
 .icon {

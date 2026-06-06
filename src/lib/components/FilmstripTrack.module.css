@@ -8,23 +8,23 @@
   position: relative;
   flex: 1;
   min-width: 0;
-  height: var(--vc-track-height, 56px);
+  height: 56px;
   border-radius: 6px;
   overflow: hidden;
-  background: var(--vc-handle-gutter-bg, var(--vc-toolbar-bg, #1c1f26));
+  background: var(--vc-handle-gutter-bg);
   touch-action: none;
   cursor: pointer;
 }
 
 .hoverPreview {
   position: absolute;
-  bottom: calc(var(--vc-track-height, 56px) + 8px);
+  bottom: calc(56px + 8px);
   z-index: 5;
   box-sizing: border-box;
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--vc-hover-preview-border-color);
   border-radius: 8px;
-  background: rgba(15, 17, 21, 0.95);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  background: var(--vc-hover-preview-bg);
+  box-shadow: 0 8px 24px var(--vc-hover-preview-shadow-color);
   overflow: hidden;
   pointer-events: none;
 }
@@ -33,18 +33,18 @@
   display: block;
   width: 100%;
   height: 82px;
-  background: var(--vc-track-bg, #0f1115);
+  background: var(--vc-track-bg);
 }
 
 .trackTime {
   position: absolute;
   bottom: 5px;
-  left: calc(var(--vc-handle-width, 14px) + 8px);
+  left: calc(14px + 8px);
   z-index: 2;
   padding: 2px 5px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.72);
-  color: var(--vc-text, #ffffff);
+  background: var(--vc-track-time-bg);
+  color: var(--vc-text);
   font-size: 11px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -69,7 +69,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  background: var(--vc-dim-overlay, rgba(0, 0, 0, 0.55));
+  background: var(--vc-dim-overlay);
 }
 
 .dimLeft {
@@ -86,7 +86,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  border: 3px solid var(--vc-accent, #f5c518);
+  border: 3px solid var(--vc-accent);
   border-radius: 4px;
   pointer-events: none;
   box-sizing: border-box;
@@ -98,8 +98,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.35);
-  color: var(--vc-text-muted, #8b919a);
+  background: var(--vc-loading-bg);
+  color: var(--vc-text-muted);
   font-size: 12px;
   pointer-events: none;
 }

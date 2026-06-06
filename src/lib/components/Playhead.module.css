@@ -3,8 +3,8 @@
   top: -2px;
   bottom: -2px;
   width: 2px;
-  background: var(--vc-playhead, #ffffff);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  background: var(--vc-playhead);
+  box-shadow: 0 0 4px var(--vc-playhead-shadow-color);
   touch-action: none;
   cursor: grab;
   z-index: 4;
@@ -22,5 +22,5 @@
   height: 8px;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: var(--vc-playhead, #ffffff);
+  background: var(--vc-playhead);
 }
