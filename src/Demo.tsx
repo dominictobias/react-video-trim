@@ -5,7 +5,7 @@ import type { TrimRange } from './lib'
 
 import './demo.css'
 
-type TrimPlugin = 'webcodecs' | 'media-recorder' | 'ffmpeg'
+type TrimPlugin = 'webcodecs' | 'mediaRecorder' | 'ffmpeg'
 
 type TrimVideoResult = {
   blob: Blob
@@ -92,9 +92,9 @@ export function Demo() {
         return
       }
 
-      if (trimPlugin === 'media-recorder') {
+      if (trimPlugin === 'mediaRecorder') {
         const { createTrimHandler } =
-          await import('./lib/plugins/media-recorder')
+          await import('./lib/plugins/mediaRecorder')
         const trim = createTrimHandler({
           src: videoSrc,
           onProgress: ({ progress }) => setTrimProgress(progress),
@@ -136,7 +136,7 @@ export function Demo() {
               }}
             >
               <option value="webcodecs">WebCodecs</option>
-              <option value="media-recorder">MediaRecorder</option>
+              <option value="mediaRecorder">MediaRecorder</option>
               <option value="ffmpeg">FFmpeg</option>
             </select>
           </label>

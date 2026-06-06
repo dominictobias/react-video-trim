@@ -10,7 +10,7 @@
   "exports": {
     ".": "./dist/react-video-trim.js",
     "./plugins/ffmpeg": "./dist/plugins/ffmpeg.js",
-    "./plugins/media-recorder": "./dist/plugins/media-recorder.js",
+    "./plugins/mediaRecorder": "./dist/plugins/mediaRecorder.js",
     "./plugins/webcodecs": "./dist/plugins/webcodecs.js",
     "./style.css": "./dist/react-video-trim.css"
   },

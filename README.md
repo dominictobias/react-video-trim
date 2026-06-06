@@ -37,7 +37,8 @@ The plugins are separate entry points so the core bundle does not load trimming 
 
 ```tsx
 import { createTrimHandler } from 'react-video-trim/plugins/ffmpeg'
-import { createTrimHandler as createMediaRecorderTrimHandler } from 'react-video-trim/plugins/media-recorder'
+import { createTrimHandler as createMediaRecorderTrimHandler } from 'react-video-trim/plugins/mediaRecorder'
+import { createTrimHandler as createWebCodecsTrimHandler } from 'react-video-trim/plugins/webcodecs'
 ```
 
 ## Props
@@ -92,6 +93,16 @@ export function App() {
   )
 }
 ```
+
+## Choosing a trimming plugin
+
+`react-video-trim` keeps browser-side video processing in optional plugins so you can choose the best trade-off for your app:
+
+- **FFmpeg plugin**: the most capable option because FFmpeg.wasm can handle a wide range of containers and codecs, but it adds a large WebAssembly payload. Expect roughly 42 MB for the FFmpeg core download before compression/caching.
+- **WebCodecs plugin**: lightweight, fast, and modern. It uses the browser's native WebCodecs APIs through Mediabunny, so it avoids shipping FFmpeg.wasm and can copy or transcode media efficiently. The trade-off is browser codec support: WebCodecs support overlaps with `<video>` playback support, but it is not identical, and some files a browser can play may not be available to decode or encode through WebCodecs.
+- **MediaRecorder plugin**: the smallest and broadest browser-native fallback. It replays the selected range through a `<video>` element and records a canvas/media stream, so it should work with anything the browser can play and MediaRecorder can output. The trade-off is that it runs in real time: trimming 20 seconds of video takes about 20 seconds.
+
+Use WebCodecs first when you want a small, fast client-side implementation for modern browsers. Use MediaRecorder when broad playback compatibility matters more than speed. Use FFmpeg when you need the widest trimming/transcoding capability and can accept the larger download.
 
 ## Example with the FFmpeg plugin
 
@@ -203,8 +214,7 @@ The MediaRecorder plugin is a MUCH more lightweight alternative to FFmpeg.wasm, 
 ```tsx
 import { useMemo, useState } from 'react'
 import { VideoCrop } from 'react-video-trim'
-import { createTrimHandler } from 'react-video-trim/plugins/media-recorder'
-import type { TrimVideoResult } from 'react-video-trim/plugins/media-recorder'
+import { createTrimHandler, type TrimVideoResult } from 'react-video-trim/plugins/mediaRecorder'
 import 'react-video-trim/style.css'
 
 export function App() {

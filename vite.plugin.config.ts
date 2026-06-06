@@ -13,9 +13,9 @@ export default defineConfig({
           import.meta.dirname,
           'src/lib/plugins/ffmpeg.ts',
         ),
-        'plugins/media-recorder': resolve(
+        'plugins/mediaRecorder': resolve(
           import.meta.dirname,
-          'src/lib/plugins/media-recorder.ts',
+          'src/lib/plugins/mediaRecorder.ts',
         ),
         'plugins/webcodecs': resolve(
           import.meta.dirname,
