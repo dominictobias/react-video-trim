@@ -10,6 +10,7 @@ type TrimHandleProps = {
 
 export function TrimHandle({ side, position, onDrag }: TrimHandleProps) {
   const draggingRef = useRef(false)
+  const dragOffsetRef = useRef(0)
 
   return (
     <div
@@ -19,6 +20,9 @@ export function TrimHandle({ side, position, onDrag }: TrimHandleProps) {
         event.preventDefault()
         event.stopPropagation()
         draggingRef.current = true
+        const rect = event.currentTarget.getBoundingClientRect()
+        const boundaryX = side === 'left' ? rect.left : rect.right
+        dragOffsetRef.current = event.clientX - boundaryX
         event.currentTarget.setPointerCapture(event.pointerId)
       }}
       onPointerMove={(event) => {
@@ -26,7 +30,7 @@ export function TrimHandle({ side, position, onDrag }: TrimHandleProps) {
           return
         }
 
-        onDrag(event.clientX)
+        onDrag(event.clientX - dragOffsetRef.current)
       }}
       onPointerUp={(event) => {
         draggingRef.current = false

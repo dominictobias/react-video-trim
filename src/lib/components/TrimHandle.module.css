@@ -3,7 +3,6 @@
   top: 0;
   bottom: 0;
   width: var(--vc-handle-width, 14px);
-  transform: translateX(-50%);
   touch-action: none;
   cursor: ew-resize;
   z-index: 3;
@@ -52,4 +51,5 @@
 
 .right {
   composes: handle;
+  transform: translateX(-100%);
 }

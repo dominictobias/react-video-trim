@@ -6,6 +6,9 @@ import { TrimHandle } from './TrimHandle'
 
 import styles from './FilmstripTrack.module.css'
 
+const HANDLE_WIDTH = 14
+const PLAYHEAD_WIDTH = 2
+
 type FilmstripTrackProps = {
   src: string
   duration: number
@@ -93,6 +96,18 @@ export function FilmstripTrack({
   const startPx = timeToPx(startTime)
   const endPx = timeToPx(endTime)
   const playheadPx = timeToPx(clampToTrimRange(currentTime))
+  const playheadMinPx = Math.min(
+    startPx + HANDLE_WIDTH,
+    Math.max(startPx, endPx - PLAYHEAD_WIDTH),
+  )
+  const playheadMaxPx = Math.max(
+    playheadMinPx,
+    endPx - HANDLE_WIDTH - PLAYHEAD_WIDTH,
+  )
+  const displayedPlayheadPx = Math.min(
+    Math.max(playheadPx, playheadMinPx),
+    playheadMaxPx,
+  )
 
   const handleTrackPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -157,7 +172,7 @@ export function FilmstripTrack({
           onDrag={(clientX) => onEndChange(pxToTime(clientX))}
         />
         <Playhead
-          position={playheadPx}
+          position={displayedPlayheadPx}
           onDrag={(clientX) => onSeek(clampToTrimRange(pxToTime(clientX)))}
         />
       </div>
