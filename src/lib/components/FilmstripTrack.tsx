@@ -104,10 +104,7 @@ export function FilmstripTrack({
       <canvas ref={canvasRef} className={styles.canvas} />
 
       <div className={styles.overlay}>
-        <div
-          className={styles.dimLeft}
-          style={{ width: `${startPx}px` }}
-        />
+        <div className={styles.dimLeft} style={{ width: `${startPx}px` }} />
         <div
           className={styles.dimRight}
           style={{ width: `${Math.max(trackWidth - endPx, 0)}px` }}

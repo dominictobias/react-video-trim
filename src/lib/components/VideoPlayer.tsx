@@ -10,10 +10,7 @@ type VideoPlayerProps = {
 }
 
 export const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
-  function VideoPlayer(
-    { src, onTogglePlay, onError, onLoadedMetadata },
-    ref,
-  ) {
+  function VideoPlayer({ src, onTogglePlay, onError, onLoadedMetadata }, ref) {
     return (
       <div className={styles.wrapper}>
         <video

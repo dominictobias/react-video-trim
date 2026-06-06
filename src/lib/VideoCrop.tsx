@@ -5,8 +5,8 @@ import { VideoPlayer } from './components/VideoPlayer'
 import { useTrimSelection } from './hooks/useTrimSelection'
 import { useVideoControls } from './hooks/useVideoControls'
 import { useVideoMetadata } from './hooks/useVideoMetadata'
-import { useVideoObjectUrl } from './useVideoObjectUrl'
 import type { VideoCropProps } from './types'
+import { useVideoObjectUrl } from './useVideoObjectUrl'
 
 import styles from './VideoCrop.module.css'
 
@@ -34,10 +34,12 @@ export function VideoCrop({
   const resolvedSrc = useVideoObjectUrl(src)
 
   const { duration, isReady } = useVideoMetadata(videoRef, resolvedSrc)
-  const { startTime, endTime, setStart, setEnd, hasChanges } = useTrimSelection({
-    duration,
-    trackWidth,
-  })
+  const { startTime, endTime, setStart, setEnd, hasChanges } = useTrimSelection(
+    {
+      duration,
+      trackWidth,
+    },
+  )
 
   const { currentTime, isPlaying, seek, togglePlay, pause } = useVideoControls(
     videoRef,

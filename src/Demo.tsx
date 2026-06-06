@@ -41,9 +41,7 @@ export function Demo() {
       )}
 
       {trimResult ? (
-        <pre className="demo-result">
-          {JSON.stringify(trimResult, null, 2)}
-        </pre>
+        <pre className="demo-result">{JSON.stringify(trimResult, null, 2)}</pre>
       ) : null}
     </div>
   )
