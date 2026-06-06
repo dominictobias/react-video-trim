@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { type KeyboardEvent, forwardRef } from 'react'
 
 import styles from './VideoPlayer.module.css'
 
@@ -7,6 +7,10 @@ type VideoPlayerProps = {
   onTogglePlay: () => void
   onError?: () => void
   onLoadedMetadata?: () => void
+}
+
+function isSpaceKey(event: KeyboardEvent) {
+  return event.key === ' ' || event.key === 'Spacebar' || event.code === 'Space'
 }
 
 export const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
@@ -19,8 +23,17 @@ export const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
           src={src}
           playsInline
           preload="metadata"
+          tabIndex={0}
           onError={onError}
           onLoadedMetadata={onLoadedMetadata}
+          onKeyDown={(event) => {
+            if (!isSpaceKey(event) || event.repeat) {
+              return
+            }
+
+            event.preventDefault()
+            onTogglePlay()
+          }}
           onPointerDown={(event) => {
             event.preventDefault()
             onTogglePlay()

@@ -1,3 +1,5 @@
+import type { KeyboardEvent } from 'react'
+
 import { FilmstripTrack } from './FilmstripTrack'
 import { PlayButton } from './PlayButton'
 import { TrimActions } from './TrimActions'
@@ -21,6 +23,10 @@ type CropToolbarProps = {
   onCancel?: () => void
 }
 
+function isSpaceKey(event: KeyboardEvent) {
+  return event.key === ' ' || event.key === 'Spacebar' || event.code === 'Space'
+}
+
 export function CropToolbar({
   src,
   duration,
@@ -37,8 +43,27 @@ export function CropToolbar({
   onTrim,
   onCancel,
 }: CropToolbarProps) {
+  const handleToolbarKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) {
+      return
+    }
+
+    if (!isSpaceKey(event) || event.repeat) {
+      return
+    }
+
+    event.preventDefault()
+    onTogglePlay()
+  }
+
   return (
-    <div className={styles.toolbar}>
+    <div
+      className={styles.toolbar}
+      role="group"
+      aria-label="Video trim controls"
+      tabIndex={0}
+      onKeyDown={handleToolbarKeyDown}
+    >
       <PlayButton isPlaying={isPlaying} onToggle={onTogglePlay} />
       <div className={styles.trackArea}>
         <FilmstripTrack

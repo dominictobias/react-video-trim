@@ -12,7 +12,7 @@ export function Demo() {
   return (
     <div className="demo">
       <header className="demo-header">
-        <h1>React Video Crop</h1>
+        <h1>React Video Trim</h1>
         <label className="demo-picker">
           Choose video
           <input

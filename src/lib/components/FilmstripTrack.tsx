@@ -89,18 +89,31 @@ export function FilmstripTrack({
   const endPx = timeToPx(endTime)
   const playheadPx = timeToPx(currentTime)
 
-  return (
-    <div
-      ref={trackRef}
-      className={styles.track}
-      onPointerDown={(event) => {
-        if (event.target !== event.currentTarget) {
-          return
-        }
+  const handleTrackPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.target !== event.currentTarget) {
+        return
+      }
 
-        onSeek(pxToTime(event.clientX))
-      }}
-    >
+      const nextTime = pxToTime(event.clientX)
+
+      if (nextTime < startTime) {
+        onStartChange(nextTime)
+        return
+      }
+
+      if (nextTime > endTime) {
+        onEndChange(nextTime)
+        return
+      }
+
+      onSeek(nextTime)
+    },
+    [endTime, onEndChange, onSeek, onStartChange, pxToTime, startTime],
+  )
+
+  return (
+    <div ref={trackRef} className={styles.track}>
       <canvas ref={canvasRef} className={styles.canvas} />
 
       <div className={styles.overlay}>
@@ -124,7 +137,10 @@ export function FilmstripTrack({
         </div>
       ) : null}
 
-      <div className={styles.interactive}>
+      <div
+        className={styles.interactive}
+        onPointerDown={handleTrackPointerDown}
+      >
         <TrimHandle
           side="left"
           position={startPx}
