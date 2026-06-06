@@ -5,8 +5,6 @@ import type { TrimRange } from './lib'
 
 import './demo.css'
 
-type TrimPlugin = 'webcodecs' | 'mediaRecorder' | 'ffmpeg'
-
 type TrimVideoResult = {
   blob: Blob
   fileName: string
@@ -35,7 +33,6 @@ function downloadTrimmedVideo({ blob, fileName }: TrimVideoResult): void {
 
 export function Demo() {
   const [videoSrc, setVideoSrc] = useState<File | null>(null)
-  const [trimPlugin, setTrimPlugin] = useState<TrimPlugin>('webcodecs')
   const [trimResult, setTrimResult] = useState<TrimVideoResult | null>(null)
   const [trimProgress, setTrimProgress] = useState<number | null>(null)
   const [trimError, setTrimError] = useState<string | null>(null)
@@ -79,33 +76,6 @@ export function Demo() {
         setTrimProgress(null)
       }
 
-      if (trimPlugin === 'ffmpeg') {
-        const { createTrimHandler } = await import('./lib/plugins/ffmpeg')
-        const trim = createTrimHandler({
-          src: videoSrc,
-          onProgress: setTrimProgress,
-          onComplete: handleComplete,
-          onError: handleError,
-        })
-
-        await trim(range)
-        return
-      }
-
-      if (trimPlugin === 'mediaRecorder') {
-        const { createTrimHandler } =
-          await import('./lib/plugins/mediaRecorder')
-        const trim = createTrimHandler({
-          src: videoSrc,
-          onProgress: ({ progress }) => setTrimProgress(progress),
-          onComplete: handleComplete,
-          onError: handleError,
-        })
-
-        await trim(range)
-        return
-      }
-
       const { createTrimHandler } = await import('./lib/plugins/webcodecs')
       const trim = createTrimHandler({
         src: videoSrc,
@@ -116,30 +86,13 @@ export function Demo() {
 
       await trim(range)
     }
-  }, [trimPlugin, videoSrc])
+  }, [videoSrc])
 
   return (
     <div className="demo">
       <header className="demo-header">
         <h1>React Video Trim</h1>
         <div className="demo-controls">
-          <label className="demo-select-label">
-            Trim with
-            <select
-              className="demo-select"
-              value={trimPlugin}
-              onChange={(event) => {
-                setTrimPlugin(event.target.value as TrimPlugin)
-                setTrimResult(null)
-                setTrimProgress(null)
-                setTrimError(null)
-              }}
-            >
-              <option value="webcodecs">WebCodecs</option>
-              <option value="mediaRecorder">MediaRecorder</option>
-              <option value="ffmpeg">FFmpeg</option>
-            </select>
-          </label>
           <label className="demo-picker">
             Choose video
             <input

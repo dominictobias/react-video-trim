@@ -2,24 +2,18 @@
 
 A React component for selecting trim ranges on a video with a filmstrip timeline.
 
-The core library reports the selected `{ startTime, endTime }` range. Optional FFmpeg.wasm and native MediaRecorder plugins can turn that range into a trimmed video file in the browser.
+The core library reports the selected `{ startTime, endTime }` range. The included WebCodecs plugin can turn that range into a trimmed video file in the browser.
 
 ## Install
 
 ```bash
-npm install react-video-trim
+bun add react-video-trim
 ```
 
 React and React DOM are required peer dependencies:
 
 ```bash
-npm install react react-dom
-```
-
-For browser-side trimming with the optional FFmpeg plugin, also install:
-
-```bash
-npm install @ffmpeg/ffmpeg @ffmpeg/util
+bun add react react-dom
 ```
 
 ## Bundler
@@ -33,12 +27,10 @@ import { VideoCrop } from 'react-video-trim'
 import 'react-video-trim/style.css'
 ```
 
-The plugins are separate entry points so the core bundle does not load trimming code unless you import it:
+The WebCodecs trimming plugin is a separate entry point so the core bundle does not load video processing code unless you import it:
 
 ```tsx
-import { createTrimHandler } from 'react-video-trim/plugins/ffmpeg'
-import { createTrimHandler as createMediaRecorderTrimHandler } from 'react-video-trim/plugins/mediaRecorder'
-import { createTrimHandler as createWebCodecsTrimHandler } from 'react-video-trim/plugins/webcodecs'
+import { createTrimHandler } from 'react-video-trim/plugins/webcodecs'
 ```
 
 ## Props
@@ -94,25 +86,17 @@ export function App() {
 }
 ```
 
-## Choosing a trimming plugin
+## WebCodecs Trimming
 
-`react-video-trim` keeps browser-side video processing in optional plugins so you can choose the best trade-off for your app:
-
-- **FFmpeg plugin**: the most capable option because FFmpeg.wasm can handle a wide range of containers and codecs, but it adds a large WebAssembly payload. Expect roughly 42 MB for the FFmpeg core download before compression/caching.
-- **WebCodecs plugin**: lightweight, fast, and modern. It uses the browser's native WebCodecs APIs through Mediabunny, so it avoids shipping FFmpeg.wasm and can copy or transcode media efficiently. The trade-off is browser codec support: WebCodecs support overlaps with `<video>` playback support, but it is not identical, and some files a browser can play may not be available to decode or encode through WebCodecs.
-- **MediaRecorder plugin**: the smallest and broadest browser-native fallback. It replays the selected range through a `<video>` element and records a canvas/media stream, so it should work with anything the browser can play and MediaRecorder can output. The trade-off is that it runs in real time: trimming 20 seconds of video takes about 20 seconds.
-
-Use WebCodecs first when you want a small, fast client-side implementation for modern browsers. Use MediaRecorder when broad playback compatibility matters more than speed. Use FFmpeg when you need the widest trimming/transcoding capability and can accept the larger download.
-
-## Example with the FFmpeg plugin
-
-Use `createTrimHandler` as an `onTrim` adapter when you want FFmpeg.wasm to produce a trimmed file:
+Use `createTrimHandler` as an `onTrim` adapter when you want WebCodecs to produce a trimmed file:
 
 ```tsx
 import { useMemo, useState } from 'react'
 import { VideoCrop } from 'react-video-trim'
-import { createTrimHandler } from 'react-video-trim/plugins/ffmpeg'
-import type { TrimVideoResult } from 'react-video-trim/plugins/ffmpeg'
+import {
+  type TrimVideoResult,
+  createTrimHandler,
+} from 'react-video-trim/plugins/webcodecs'
 import 'react-video-trim/style.css'
 
 export function App() {
@@ -124,9 +108,10 @@ export function App() {
 
     return createTrimHandler({
       src: videoFile,
+      outputFormat: 'mp4',
       onComplete: setResult,
       onError: console.error,
-      onProgress: (progress) => {
+      onProgress: ({ progress }) => {
         console.log(`Trimming… ${Math.round(progress * 100)}%`)
       },
     })
@@ -145,10 +130,10 @@ export function App() {
 }
 ```
 
-Or call `trimVideo` directly:
+Or call `trimVideo` directly when you do not need the React handler adapter:
 
 ```tsx
-import { trimVideo } from 'react-video-trim/plugins/ffmpeg'
+import { trimVideo } from 'react-video-trim/plugins/webcodecs'
 
 const result = await trimVideo(videoFile, {
   startTime: 2.5,
@@ -158,106 +143,43 @@ const result = await trimVideo(videoFile, {
 const url = URL.createObjectURL(result.blob)
 ```
 
-The FFmpeg plugin loads FFmpeg lazily on first use and downloads `@ffmpeg/core` from a CDN by default.
+The WebCodecs implementation uses Mediabunny to trim media in modern browsers without shipping a large video processing runtime. It can copy media data when possible and transcode when needed, depending on the browser codecs and selected output format.
 
-## Example with the WebCodecs plugin
+## Alternatives
 
-The WebCodecs plugin uses Mediabunny to trim media in modern browsers without shipping FFmpeg.wasm. It can copy media data when possible and transcode when needed, depending on the browser codecs and output format:
+WebCodecs is the default recommendation for this package because it keeps the browser bundle small and uses native media APIs. Depending on your product requirements, you may still consider another trimming strategy in your own app.
 
-```tsx
-import { useMemo, useState } from 'react'
-import { VideoCrop } from 'react-video-trim'
-import { createTrimHandler } from 'react-video-trim/plugins/webcodecs'
-import type { TrimVideoResult } from 'react-video-trim/plugins/webcodecs'
-import 'react-video-trim/style.css'
+### FFmpeg
 
-export function App() {
-  const [videoFile, setVideoFile] = useState<File | null>(null)
-  const [result, setResult] = useState<TrimVideoResult | null>(null)
+FFmpeg.wasm runs FFmpeg in the browser through WebAssembly.
 
-  const onTrim = useMemo(() => {
-    if (!videoFile) return undefined
+Pros:
 
-    return createTrimHandler({
-      src: videoFile,
-      outputFormat: 'mp4',
-      onComplete: setResult,
-      onError: console.error,
-      onProgress: ({ progress }) => {
-        console.log(`Trimming... ${Math.round(progress * 100)}%`)
-      },
-    })
-  }, [videoFile])
+- Handles a broad range of containers, codecs, and transformations.
+- Gives you FFmpeg's familiar command model when you need advanced processing.
+- Can be a good fit for apps that need maximum format coverage and can tolerate heavier downloads.
 
-  if (!videoFile || !onTrim) return null
+Cons:
 
-  return (
-    <>
-      <VideoCrop
-        src={videoFile}
-        onTrim={(range) => {
-          void onTrim(range)
-        }}
-      />
-      {result ? (
-        <video src={URL.createObjectURL(result.blob)} controls />
-      ) : null}
-    </>
-  )
-}
-```
+- Adds a large (~38-42mb) WebAssembly payload compared with WebCodecs.
+- Usually has a slower startup because the FFmpeg runtime must load before work begins.
+- Increases memory and CPU pressure, especially on mobile devices.
 
-## Example with the MediaRecorder plugin
+### MediaRecorder
 
-The MediaRecorder plugin is a MUCH more lightweight alternative to FFmpeg.wasm, which is massive. The caveat is that it records the selected range in real time, so trimming a 20 second range takes about 20 seconds. Use the progress callback to show your own loader and estimated time left:
+MediaRecorder can replay the selected range through a media element or canvas stream and record the result with native browser APIs.
 
-```tsx
-import { useMemo, useState } from 'react'
-import { VideoCrop } from 'react-video-trim'
-import { createTrimHandler, type TrimVideoResult } from 'react-video-trim/plugins/mediaRecorder'
-import 'react-video-trim/style.css'
+Pros:
 
-export function App() {
-  const [videoFile, setVideoFile] = useState<File | null>(null)
-  const [result, setResult] = useState<TrimVideoResult | null>(null)
-  const [secondsLeft, setSecondsLeft] = useState<number | null>(null)
+- No large processing runtime to download.
+- Works with browser-native APIs and can support files the browser can play.
+- Useful as a simple compatibility fallback for basic recording workflows.
 
-  const onTrim = useMemo(() => {
-    if (!videoFile) return undefined
+Cons:
 
-    return createTrimHandler({
-      src: videoFile,
-      onComplete: (trimResult) => {
-        setResult(trimResult)
-        setSecondsLeft(null)
-      },
-      onError: console.error,
-      onProgress: ({ remainingSeconds }) => {
-        setSecondsLeft(Math.ceil(remainingSeconds))
-      },
-    })
-  }, [videoFile])
-
-  if (!videoFile || !onTrim) return null
-
-  return (
-    <>
-      <VideoCrop
-        src={videoFile}
-        onTrim={(range) => {
-          void onTrim(range)
-        }}
-      />
-      {secondsLeft !== null ? (
-        <p>Trimming video, about {secondsLeft}s left.</p>
-      ) : null}
-      {result ? (
-        <video src={URL.createObjectURL(result.blob)} controls />
-      ) : null}
-    </>
-  )
-}
-```
+- Runs in real time, so trimming a 20 second range takes about 20 seconds.
+- Output format and codec choices are limited by each browser's MediaRecorder support.
+- Re-recording can reduce quality and may not preserve the original media streams exactly.
 
 ## Development
 
@@ -273,9 +195,9 @@ bun run dev
 Other useful commands:
 
 ```bash
-bun run build   # type-check and build dist/react-video-trim.js + dist/plugins/*.js
+bun run build   # type-check and build dist/react-video-trim.js + dist/plugins/webcodecs.js
 bun run lint
 bun run preview # preview the production build locally
 ```
 
-The demo lives in `src/Demo.tsx` and uses the FFmpeg plugin to trim and preview the output.
+The demo lives in `src/Demo.tsx` and uses WebCodecs to trim and preview the output.

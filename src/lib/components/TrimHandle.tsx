@@ -21,7 +21,7 @@ export function TrimHandle({ side, position, onDrag }: TrimHandleProps) {
         event.stopPropagation()
         draggingRef.current = true
         const rect = event.currentTarget.getBoundingClientRect()
-        const boundaryX = side === 'left' ? rect.left : rect.right
+        const boundaryX = side === 'left' ? rect.right : rect.left
         dragOffsetRef.current = event.clientX - boundaryX
         event.currentTarget.setPointerCapture(event.pointerId)
       }}

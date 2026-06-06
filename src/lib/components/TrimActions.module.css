@@ -17,6 +17,10 @@
   cursor: pointer;
 }
 
+.button:focus-visible {
+  outline: 1px solid var(--vc-accent, #f5c518);
+}
+
 .button:hover:not(:disabled) {
   background: var(--vc-button-bg-hover, #353b48);
 }

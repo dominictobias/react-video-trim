@@ -7,6 +7,10 @@
   background: var(--vc-toolbar-bg, #1c1f26);
 }
 
+.toolbar:focus-visible {
+  outline: 1px solid var(--vc-accent, #f5c518);
+}
+
 .trackArea {
   flex: 1;
   min-width: 0;

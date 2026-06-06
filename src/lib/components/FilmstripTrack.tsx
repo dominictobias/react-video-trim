@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useFilmstrip } from '../hooks/useFilmstrip'
+import { useHoverThumbnail } from '../hooks/useHoverThumbnail'
 import { Playhead } from './Playhead'
 import { TrimHandle } from './TrimHandle'
 
@@ -8,6 +9,8 @@ import styles from './FilmstripTrack.module.css'
 
 const HANDLE_WIDTH = 14
 const PLAYHEAD_WIDTH = 2
+const HOVER_PREVIEW_WIDTH = 144
+const HOVER_PREVIEW_HEIGHT = 82
 
 type FilmstripTrackProps = {
   src: string
@@ -19,6 +22,16 @@ type FilmstripTrackProps = {
   onStartChange: (time: number) => void
   onEndChange: (time: number) => void
   onTrackWidthChange: (width: number) => void
+}
+
+function formatPreviewTime(time: number) {
+  const minutes = Math.floor(time / 60)
+  const seconds = Math.floor(time % 60)
+  const milliseconds = Math.floor((time % 1) * 1000)
+
+  return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds
+    .toString()
+    .padStart(3, '0')}`
 }
 
 export function FilmstripTrack({
@@ -34,13 +47,26 @@ export function FilmstripTrack({
 }: FilmstripTrackProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [trackWidth, setTrackWidth] = useState(0)
+  const [hoverPreview, setHoverPreview] = useState<{
+    x: number
+    time: number
+  } | null>(null)
   const trackHeight = 56
+  const timelineLeftPx = HANDLE_WIDTH
+  const timelineWidth = Math.max(trackWidth - HANDLE_WIDTH * 2, 0)
 
   const { canvasRef, isLoading, progress } = useFilmstrip({
     src,
     duration,
-    trackWidth,
+    trackWidth: timelineWidth,
     trackHeight,
+  })
+  const { canvasRef: hoverCanvasRef } = useHoverThumbnail({
+    src,
+    duration,
+    time: hoverPreview?.time ?? null,
+    width: HOVER_PREVIEW_WIDTH,
+    height: HOVER_PREVIEW_HEIGHT,
   })
 
   useEffect(() => {
@@ -63,6 +89,16 @@ export function FilmstripTrack({
     return () => observer.disconnect()
   }, [onTrackWidthChange])
 
+  const clientXToTrackPx = useCallback((clientX: number) => {
+    const track = trackRef.current
+    if (!track) {
+      return 0
+    }
+
+    const rect = track.getBoundingClientRect()
+    return Math.min(Math.max(clientX - rect.left, 0), rect.width)
+  }, [])
+
   const pxToTime = useCallback(
     (clientX: number) => {
       const track = trackRef.current
@@ -71,10 +107,21 @@ export function FilmstripTrack({
       }
 
       const rect = track.getBoundingClientRect()
-      const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1)
-      return ratio * duration
+      if (!rect.width) {
+        return 0
+      }
+
+      const timelineWidth = Math.max(rect.width - HANDLE_WIDTH * 2, 0)
+      if (!timelineWidth) {
+        return 0
+      }
+
+      const x = clientXToTrackPx(clientX)
+      const timelineX = Math.min(Math.max(x - HANDLE_WIDTH, 0), timelineWidth)
+
+      return (timelineX / timelineWidth) * duration
     },
-    [duration],
+    [clientXToTrackPx, duration],
   )
 
   const timeToPx = useCallback(
@@ -83,9 +130,9 @@ export function FilmstripTrack({
         return 0
       }
 
-      return (time / duration) * trackWidth
+      return timelineLeftPx + (time / duration) * timelineWidth
     },
-    [duration, trackWidth],
+    [duration, timelineLeftPx, timelineWidth, trackWidth],
   )
 
   const clampToTrimRange = useCallback(
@@ -93,21 +140,27 @@ export function FilmstripTrack({
     [endTime, startTime],
   )
 
-  const startPx = timeToPx(startTime)
-  const endPx = timeToPx(endTime)
+  const startBoundaryPx = timeToPx(startTime)
+  const endBoundaryPx = timeToPx(endTime)
+  const startPx = Math.max(startBoundaryPx - HANDLE_WIDTH, 0)
+  const endPx = Math.min(endBoundaryPx + HANDLE_WIDTH, trackWidth)
   const playheadPx = timeToPx(clampToTrimRange(currentTime))
   const playheadMinPx = Math.min(
-    startPx + HANDLE_WIDTH,
-    Math.max(startPx, endPx - PLAYHEAD_WIDTH),
+    startBoundaryPx,
+    Math.max(startBoundaryPx, endBoundaryPx - PLAYHEAD_WIDTH),
   )
-  const playheadMaxPx = Math.max(
-    playheadMinPx,
-    endPx - HANDLE_WIDTH - PLAYHEAD_WIDTH,
-  )
+  const playheadMaxPx = Math.max(playheadMinPx, endBoundaryPx - PLAYHEAD_WIDTH)
   const displayedPlayheadPx = Math.min(
     Math.max(playheadPx, playheadMinPx),
     playheadMaxPx,
   )
+  const hoverPreviewLeft = hoverPreview
+    ? Math.min(
+        Math.max(hoverPreview.x - HOVER_PREVIEW_WIDTH / 2, 0),
+        Math.max(trackWidth - HOVER_PREVIEW_WIDTH, 0),
+      )
+    : 0
+  const displayedTime = hoverPreview?.time ?? clampToTrimRange(currentTime)
 
   const handleTrackPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -132,49 +185,94 @@ export function FilmstripTrack({
     [endTime, onEndChange, onSeek, onStartChange, pxToTime, startTime],
   )
 
+  const handleTrackPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const x = clientXToTrackPx(event.clientX)
+      setHoverPreview({
+        x,
+        time: pxToTime(event.clientX),
+      })
+    },
+    [clientXToTrackPx, pxToTime],
+  )
+
   return (
-    <div ref={trackRef} className={styles.track}>
-      <canvas ref={canvasRef} className={styles.canvas} />
-
-      <div className={styles.overlay}>
-        <div className={styles.dimLeft} style={{ width: `${startPx}px` }} />
+    <div className={styles.container}>
+      {hoverPreview ? (
         <div
-          className={styles.dimRight}
-          style={{ width: `${Math.max(trackWidth - endPx, 0)}px` }}
-        />
-        <div
-          className={styles.selection}
+          className={styles.hoverPreview}
           style={{
-            left: `${startPx}px`,
-            width: `${Math.max(endPx - startPx, 0)}px`,
+            left: `${hoverPreviewLeft}px`,
+            width: `${HOVER_PREVIEW_WIDTH}px`,
           }}
-        />
-      </div>
-
-      {isLoading ? (
-        <div className={styles.loading}>
-          Loading frames {progress.loaded}/{progress.total}
+          aria-hidden="true"
+        >
+          <canvas
+            ref={hoverCanvasRef}
+            className={styles.hoverCanvas}
+            width={HOVER_PREVIEW_WIDTH}
+            height={HOVER_PREVIEW_HEIGHT}
+          />
         </div>
       ) : null}
 
-      <div
-        className={styles.interactive}
-        onPointerDown={handleTrackPointerDown}
-      >
-        <TrimHandle
-          side="left"
-          position={startPx}
-          onDrag={(clientX) => onStartChange(pxToTime(clientX))}
+      <div ref={trackRef} className={styles.track}>
+        <canvas
+          ref={canvasRef}
+          className={styles.canvas}
+          style={{
+            left: `${timelineLeftPx}px`,
+            width: `${timelineWidth}px`,
+          }}
         />
-        <TrimHandle
-          side="right"
-          position={endPx}
-          onDrag={(clientX) => onEndChange(pxToTime(clientX))}
-        />
-        <Playhead
-          position={displayedPlayheadPx}
-          onDrag={(clientX) => onSeek(clampToTrimRange(pxToTime(clientX)))}
-        />
+
+        <div className={styles.overlay}>
+          <div className={styles.dimLeft} style={{ width: `${startPx}px` }} />
+          <div
+            className={styles.dimRight}
+            style={{ width: `${Math.max(trackWidth - endPx, 0)}px` }}
+          />
+          <div
+            className={styles.selection}
+            style={{
+              left: `${startPx}px`,
+              width: `${Math.max(endPx - startPx, 0)}px`,
+            }}
+          />
+        </div>
+
+        {isLoading ? (
+          <div className={styles.loading}>
+            Loading frames {progress.loaded}/{progress.total}
+          </div>
+        ) : null}
+
+        <span className={styles.trackTime} aria-hidden="true">
+          {formatPreviewTime(displayedTime)}
+        </span>
+
+        <div
+          className={styles.interactive}
+          onPointerDown={handleTrackPointerDown}
+          onPointerMove={handleTrackPointerMove}
+          onPointerLeave={() => setHoverPreview(null)}
+          onPointerCancel={() => setHoverPreview(null)}
+        >
+          <TrimHandle
+            side="left"
+            position={startPx}
+            onDrag={(clientX) => onStartChange(pxToTime(clientX))}
+          />
+          <TrimHandle
+            side="right"
+            position={endPx}
+            onDrag={(clientX) => onEndChange(pxToTime(clientX))}
+          />
+          <Playhead
+            position={displayedPlayheadPx}
+            onDrag={(clientX) => onSeek(clampToTrimRange(pxToTime(clientX)))}
+          />
+        </div>
       </div>
     </div>
   )

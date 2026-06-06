@@ -9,8 +9,6 @@
   "main": "./dist/react-video-trim.js",
   "exports": {
     ".": "./dist/react-video-trim.js",
-    "./plugins/ffmpeg": "./dist/plugins/ffmpeg.js",
-    "./plugins/mediaRecorder": "./dist/plugins/mediaRecorder.js",
     "./plugins/webcodecs": "./dist/plugins/webcodecs.js",
     "./style.css": "./dist/react-video-trim.css"
   },
@@ -22,10 +20,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ffmpeg/core": "^0.12.10",
-    "@ffmpeg/ffmpeg": "^0.12.15",
-    "@ffmpeg/util": "^0.12.2",
-    "mediabunny": "^1.46.0",
+    "mediabunny": "^1.46.0"
+  },
+  "peerDependencies": {
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

@@ -7,6 +7,13 @@ export type FrameExtractorOptions = {
   onProgress?: (loaded: number, total: number) => void
 }
 
+export type FrameExtractorFrameOptions = {
+  src: string
+  time: number
+  signal: AbortSignal
+  onFrame: (frame: HTMLVideoElement) => void
+}
+
 function waitForEvent(
   target: EventTarget,
   eventName: string,
@@ -84,6 +91,32 @@ function getFrameSize(frame: HTMLVideoElement) {
   }
 }
 
+export function drawVideoFrame(
+  ctx: CanvasRenderingContext2D,
+  frame: HTMLVideoElement,
+  x: number,
+  y: number,
+  targetWidth: number,
+  targetHeight: number,
+  fit: 'contain' | 'cover' = 'cover',
+) {
+  const { width, height } = getFrameSize(frame)
+  if (!width || !height) {
+    return
+  }
+
+  const scale =
+    fit === 'contain'
+      ? Math.min(targetWidth / width, targetHeight / height)
+      : Math.max(targetWidth / width, targetHeight / height)
+  const drawWidth = width * scale
+  const drawHeight = height * scale
+  const offsetX = x + (targetWidth - drawWidth) / 2
+  const offsetY = y + (targetHeight - drawHeight) / 2
+
+  ctx.drawImage(frame, offsetX, offsetY, drawWidth, drawHeight)
+}
+
 export function drawFilmstripFrame(
   ctx: CanvasRenderingContext2D,
   index: number,
@@ -91,15 +124,7 @@ export function drawFilmstripFrame(
   thumbWidth: number,
   thumbHeight: number,
 ) {
-  const x = index * thumbWidth
-  const { width, height } = getFrameSize(frame)
-  const scale = Math.max(thumbWidth / width, thumbHeight / height)
-  const drawWidth = width * scale
-  const drawHeight = height * scale
-  const offsetX = x + (thumbWidth - drawWidth) / 2
-  const offsetY = (thumbHeight - drawHeight) / 2
-
-  ctx.drawImage(frame, offsetX, offsetY, drawWidth, drawHeight)
+  drawVideoFrame(ctx, frame, index * thumbWidth, 0, thumbWidth, thumbHeight)
 }
 
 export async function extractFrames({
@@ -144,6 +169,35 @@ export async function extractFrames({
       onFrame(index, video)
       onProgress?.(index + 1, count)
     }
+  } finally {
+    video.removeAttribute('src')
+    video.load()
+  }
+}
+
+export async function extractFrameAtTime({
+  src,
+  time,
+  signal,
+  onFrame,
+}: FrameExtractorFrameOptions): Promise<void> {
+  const video = document.createElement('video')
+  video.preload = 'auto'
+  video.muted = true
+  video.playsInline = true
+
+  if (/^https?:\/\//.test(src)) {
+    video.crossOrigin = 'anonymous'
+  }
+
+  video.src = src
+
+  try {
+    await waitForMetadata(video, signal)
+    await seekVideo(video, Math.max(time, 0), signal)
+    await waitForCurrentFrame(video, signal)
+
+    onFrame(video)
   } finally {
     video.removeAttribute('src')
     video.load()

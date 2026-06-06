@@ -14,7 +14,6 @@
   border: 3px solid var(--vc-accent, #f5c518);
   border-radius: 4px;
   background: var(--vc-accent, #f5c518);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
 .left .grip {

@@ -13,6 +13,10 @@
   cursor: pointer;
 }
 
+.button:focus-visible {
+  outline: 1px solid var(--vc-accent, #f5c518);
+}
+
 .button:hover {
   background: rgba(255, 255, 255, 0.08);
 }
