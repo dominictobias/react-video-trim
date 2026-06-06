@@ -9,13 +9,17 @@ The core library reports the selected `{ startTime, endTime }` range. The includ
 ## Install
 
 ```bash
+# npm
+npm install react-video-trim
+
+# yarn
+yarn add react-video-trim
+
+# pnpm
+pnpm add react-video-trim
+
+# bun
 bun add react-video-trim
-```
-
-React and React DOM are required peer dependencies:
-
-```bash
-bun add react react-dom
 ```
 
 ## Bundler
@@ -145,7 +149,7 @@ const result = await trimVideo(videoFile, {
 const url = URL.createObjectURL(result.blob)
 ```
 
-The WebCodecs implementation uses Mediabunny to trim media in modern browsers without shipping a large video processing runtime. It can copy media data when possible and transcode when needed, depending on the browser codecs and selected output format.
+The WebCodecs implementation uses [Mediabunny](https://github.com/Vanilagy/mediabunny/) to trim media in modern browsers without shipping a large video processing runtime. It can copy media data when possible and transcode when needed, depending on the browser codecs and selected output format.
 
 ## Alternatives
 
@@ -153,7 +157,7 @@ WebCodecs is the default recommendation for this package because it keeps the br
 
 ### FFmpeg
 
-FFmpeg.wasm runs FFmpeg in the browser through WebAssembly.
+[FFmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) runs FFmpeg in the browser through WebAssembly.
 
 Pros:
 
@@ -169,7 +173,7 @@ Cons:
 
 ### MediaRecorder
 
-MediaRecorder can replay the selected range through a media element or canvas stream and record the result with native browser APIs.
+[MediaRecorder](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder) can replay the selected range through a media element or canvas stream and record the result with native browser APIs.
 
 Pros:
 
