@@ -1,0 +1,27 @@
+.playhead {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--vc-playhead, #ffffff);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  touch-action: none;
+  cursor: grab;
+  z-index: 4;
+}
+
+.playhead:active {
+  cursor: grabbing;
+}
+
+.knob {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--vc-playhead, #ffffff);
+}

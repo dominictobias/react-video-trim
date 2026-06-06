@@ -1,0 +1,68 @@
+.track {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: var(--vc-track-height, 56px);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--vc-track-bg, #0f1115);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.dim {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--vc-dim-overlay, rgba(0, 0, 0, 0.55));
+}
+
+.dimLeft {
+  composes: dim;
+  left: 0;
+}
+
+.dimRight {
+  composes: dim;
+  right: 0;
+}
+
+.selection {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border: 3px solid var(--vc-accent, #f5c518);
+  border-radius: 4px;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--vc-text-muted, #8b919a);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.interactive {
+  position: absolute;
+  inset: 0;
+}

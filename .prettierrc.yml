@@ -1,0 +1,13 @@
+printWidth: 80
+tabWidth: 2
+trailingComma: all
+singleQuote: true
+semi: false
+plugins:
+  - '@trivago/prettier-plugin-sort-imports'
+importOrder:
+  - '^@/(.*)$'
+  - '^[./](?!.*\.css$)'
+  - '^[./].*\.css$'
+importOrderSeparation: true
+importOrderSortSpecifiers: true

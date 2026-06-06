@@ -1,0 +1,33 @@
+.root {
+  --vc-accent: #f5c518;
+  --vc-toolbar-bg: #1c1f26;
+  --vc-toolbar-radius: 12px;
+  --vc-track-bg: #0f1115;
+  --vc-track-height: 56px;
+  --vc-handle-width: 14px;
+  --vc-button-bg: #2a2f3a;
+  --vc-button-bg-hover: #353b48;
+  --vc-button-disabled-bg: #22262e;
+  --vc-text: #ffffff;
+  --vc-text-muted: #8b919a;
+  --vc-text-disabled: #555a63;
+  --vc-dim-overlay: rgba(0, 0, 0, 0.55);
+  --vc-playhead: #ffffff;
+  --vc-gap: 12px;
+  --vc-toolbar-padding: 10px 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--vc-gap);
+  width: 100%;
+  max-width: 100%;
+  color: var(--vc-text);
+}
+
+.error {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #3a1f1f;
+  color: #ffb4b4;
+  font-size: 14px;
+}

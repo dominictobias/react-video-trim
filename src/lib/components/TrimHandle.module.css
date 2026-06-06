@@ -1,0 +1,55 @@
+.handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--vc-handle-width, 14px);
+  transform: translateX(-50%);
+  touch-action: none;
+  cursor: ew-resize;
+  z-index: 3;
+}
+
+.grip {
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--vc-accent, #f5c518);
+  border-radius: 4px;
+  background: var(--vc-accent, #f5c518);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.left .grip {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+
+.right .grip {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none;
+}
+
+.lines {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  gap: 2px;
+  transform: translate(-50%, -50%);
+}
+
+.line {
+  width: 2px;
+  height: 14px;
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.left {
+  composes: handle;
+}
+
+.right {
+  composes: handle;
+}

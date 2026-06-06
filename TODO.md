@@ -1,0 +1,1 @@
+- Add Split Clip like QuickTime has
