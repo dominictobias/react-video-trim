@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { CropToolbar } from './components/CropToolbar'
 import { VideoPlayer } from './components/VideoPlayer'
@@ -45,6 +45,28 @@ export function VideoCrop({
     videoRef,
     { trimStart: startTime, trimEnd: endTime, src: resolvedSrc },
   )
+
+  const seekWithinTrim = useCallback(
+    (time: number) => {
+      seek(Math.min(Math.max(time, startTime), endTime))
+    },
+    [endTime, seek, startTime],
+  )
+
+  useEffect(() => {
+    if (!isReady) {
+      return
+    }
+
+    if (currentTime < startTime) {
+      seekWithinTrim(startTime)
+      return
+    }
+
+    if (currentTime > endTime) {
+      seekWithinTrim(endTime)
+    }
+  }, [currentTime, endTime, isReady, seekWithinTrim, startTime])
 
   const handleTrackWidthChange = useCallback((width: number) => {
     setTrackWidth(width)
@@ -107,7 +129,7 @@ export function VideoCrop({
           isPlaying={isPlaying}
           canTrim={hasChanges}
           onTogglePlay={togglePlay}
-          onSeek={seek}
+          onSeek={seekWithinTrim}
           onStartChange={setStart}
           onEndChange={setEnd}
           onTrackWidthChange={handleTrackWidthChange}

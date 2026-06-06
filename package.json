@@ -3,14 +3,29 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/react-video-trim.js",
+  "exports": {
+    ".": "./dist/react-video-trim.js",
+    "./plugins/ffmpeg": "./dist/plugins/ffmpeg.js",
+    "./plugins/media-recorder": "./dist/plugins/media-recorder.js",
+    "./plugins/webcodecs": "./dist/plugins/webcodecs.js",
+    "./style.css": "./dist/react-video-trim.css"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --config vite.plugin.config.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ffmpeg/core": "^0.12.10",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "mediabunny": "^1.46.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

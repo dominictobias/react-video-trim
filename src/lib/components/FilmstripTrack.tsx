@@ -85,9 +85,14 @@ export function FilmstripTrack({
     [duration, trackWidth],
   )
 
+  const clampToTrimRange = useCallback(
+    (time: number) => Math.min(Math.max(time, startTime), endTime),
+    [endTime, startTime],
+  )
+
   const startPx = timeToPx(startTime)
   const endPx = timeToPx(endTime)
-  const playheadPx = timeToPx(currentTime)
+  const playheadPx = timeToPx(clampToTrimRange(currentTime))
 
   const handleTrackPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -153,7 +158,7 @@ export function FilmstripTrack({
         />
         <Playhead
           position={playheadPx}
-          onDrag={(clientX) => onSeek(pxToTime(clientX))}
+          onDrag={(clientX) => onSeek(clampToTrimRange(pxToTime(clientX)))}
         />
       </div>
     </div>

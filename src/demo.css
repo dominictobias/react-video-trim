@@ -36,6 +36,12 @@ body {
   font-weight: 600;
 }
 
+.demo-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .demo-picker {
   display: inline-flex;
   align-items: center;
@@ -49,6 +55,23 @@ body {
 
 .demo-picker input {
   display: none;
+}
+
+.demo-select-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #c8ced8;
+  font-size: 14px;
+}
+
+.demo-select {
+  padding: 8px 28px 8px 10px;
+  border: 1px solid #2b3039;
+  border-radius: 8px;
+  background: #1c1f26;
+  color: #ffffff;
+  font: inherit;
 }
 
 .demo-placeholder {
@@ -67,4 +90,32 @@ body {
   background: #141820;
   font-size: 13px;
   overflow-x: auto;
+}
+
+.demo-result pre {
+  margin: 0 0 12px;
+}
+
+.demo-status,
+.demo-error {
+  margin: 16px 0 0;
+  font-size: 14px;
+}
+
+.demo-error {
+  color: #ff8a8a;
+}
+
+.demo-preview {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  border-radius: 8px;
+  background: #000;
+}
+
+.demo-download {
+  display: inline-block;
+  margin-top: 12px;
+  color: #8ec5ff;
 }
