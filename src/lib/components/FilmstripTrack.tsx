@@ -196,6 +196,10 @@ export function FilmstripTrack({
     [clientXToTrackPx, pxToTime],
   )
 
+  const clearHoverPreview = useCallback(() => {
+    setHoverPreview(null)
+  }, [])
+
   return (
     <div className={styles.container}>
       {hoverPreview ? (
@@ -227,10 +231,19 @@ export function FilmstripTrack({
         />
 
         <div className={styles.overlay}>
-          <div className={styles.dimLeft} style={{ width: `${startPx}px` }} />
+          <div
+            className={styles.dimLeft}
+            style={{
+              left: `${timelineLeftPx}px`,
+              width: `${Math.max(startBoundaryPx - timelineLeftPx, 0)}px`,
+            }}
+          />
           <div
             className={styles.dimRight}
-            style={{ width: `${Math.max(trackWidth - endPx, 0)}px` }}
+            style={{
+              right: `${HANDLE_WIDTH}px`,
+              width: `${Math.max(timelineLeftPx + timelineWidth - endBoundaryPx, 0)}px`,
+            }}
           />
           <div
             className={styles.selection}
@@ -262,15 +275,21 @@ export function FilmstripTrack({
             side="left"
             position={startPx}
             onDrag={(clientX) => onStartChange(pxToTime(clientX))}
+            onDragStart={clearHoverPreview}
+            onDragEnd={clearHoverPreview}
           />
           <TrimHandle
             side="right"
             position={endPx}
             onDrag={(clientX) => onEndChange(pxToTime(clientX))}
+            onDragStart={clearHoverPreview}
+            onDragEnd={clearHoverPreview}
           />
           <Playhead
             position={displayedPlayheadPx}
             onDrag={(clientX) => onSeek(clampToTrimRange(pxToTime(clientX)))}
+            onDragStart={clearHoverPreview}
+            onDragEnd={clearHoverPreview}
           />
         </div>
       </div>

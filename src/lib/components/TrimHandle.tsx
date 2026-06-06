@@ -6,9 +6,17 @@ type TrimHandleProps = {
   side: 'left' | 'right'
   position: number
   onDrag: (clientX: number) => void
+  onDragStart?: () => void
+  onDragEnd?: () => void
 }
 
-export function TrimHandle({ side, position, onDrag }: TrimHandleProps) {
+export function TrimHandle({
+  side,
+  position,
+  onDrag,
+  onDragStart,
+  onDragEnd,
+}: TrimHandleProps) {
   const draggingRef = useRef(false)
   const dragOffsetRef = useRef(0)
 
@@ -24,21 +32,27 @@ export function TrimHandle({ side, position, onDrag }: TrimHandleProps) {
         const boundaryX = side === 'left' ? rect.right : rect.left
         dragOffsetRef.current = event.clientX - boundaryX
         event.currentTarget.setPointerCapture(event.pointerId)
+        onDragStart?.()
       }}
       onPointerMove={(event) => {
         if (!draggingRef.current) {
           return
         }
 
+        event.stopPropagation()
         onDrag(event.clientX - dragOffsetRef.current)
       }}
       onPointerUp={(event) => {
+        event.stopPropagation()
         draggingRef.current = false
         event.currentTarget.releasePointerCapture(event.pointerId)
+        onDragEnd?.()
       }}
       onPointerCancel={(event) => {
+        event.stopPropagation()
         draggingRef.current = false
         event.currentTarget.releasePointerCapture(event.pointerId)
+        onDragEnd?.()
       }}
     >
       <div className={styles.grip}>

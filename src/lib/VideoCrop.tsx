@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { CropToolbar } from './components/CropToolbar'
 import { VideoPlayer } from './components/VideoPlayer'
+import { MIN_TRIM_DURATION } from './constants'
 import { useTrimSelection } from './hooks/useTrimSelection'
 import { useVideoControls } from './hooks/useVideoControls'
 import { useVideoMetadata } from './hooks/useVideoMetadata'
@@ -72,6 +73,28 @@ export function VideoCrop({
     setTrackWidth(width)
   }, [])
 
+  const handleStartChange = useCallback(
+    (time: number) => {
+      const maxStart = Math.max(0, endTime - MIN_TRIM_DURATION)
+      const nextStart = Math.min(Math.max(time, 0), maxStart)
+
+      setStart(nextStart)
+      seek(nextStart, { start: nextStart, end: endTime })
+    },
+    [endTime, seek, setStart],
+  )
+
+  const handleEndChange = useCallback(
+    (time: number) => {
+      const minEnd = Math.min(duration, startTime + MIN_TRIM_DURATION)
+      const nextEnd = Math.min(Math.max(time, minEnd), duration)
+
+      setEnd(nextEnd)
+      seek(nextEnd, { start: startTime, end: nextEnd })
+    },
+    [duration, seek, setEnd, startTime],
+  )
+
   const handleTrim = useCallback(() => {
     pause()
     onTrim({ startTime, endTime })
@@ -130,8 +153,8 @@ export function VideoCrop({
           canTrim={hasChanges}
           onTogglePlay={togglePlay}
           onSeek={seekWithinTrim}
-          onStartChange={setStart}
-          onEndChange={setEnd}
+          onStartChange={handleStartChange}
+          onEndChange={handleEndChange}
           onTrackWidthChange={handleTrackWidthChange}
           onTrim={handleTrim}
           onCancel={onCancel}

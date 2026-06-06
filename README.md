@@ -2,6 +2,8 @@
 
 A React component for selecting trim ranges on a video with a filmstrip timeline.
 
+<video src="https://raw.githubusercontent.com/dominictobias/react-video-trim/main/demo_720p.mp4@demo_720p.mp4" controls muted playsinline></video>
+
 The core library reports the selected `{ startTime, endTime }` range. The included WebCodecs plugin can turn that range into a trimmed video file in the browser.
 
 ## Install

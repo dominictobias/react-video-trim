@@ -11,7 +11,7 @@
   height: var(--vc-track-height, 56px);
   border-radius: 6px;
   overflow: hidden;
-  background: var(--vc-track-bg, #0f1115);
+  background: var(--vc-handle-gutter-bg, var(--vc-toolbar-bg, #1c1f26));
   touch-action: none;
   cursor: pointer;
 }

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 
-const MIN_TRIM_DURATION = 0.1
+import { MIN_TRIM_DURATION } from '../constants'
 
 type UseTrimSelectionOptions = {
   duration: number

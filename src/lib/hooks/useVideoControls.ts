@@ -6,6 +6,11 @@ type UseVideoControlsOptions = {
   src: string | null
 }
 
+type TrimRange = {
+  start: number
+  end: number
+}
+
 export function useVideoControls(
   videoRef: React.RefObject<HTMLVideoElement | null>,
   { trimStart, trimEnd, src }: UseVideoControlsOptions,
@@ -14,13 +19,21 @@ export function useVideoControls(
   const [currentTime, setCurrentTime] = useState(0)
   const [isReady, setIsReady] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
-  const loopRef = useRef(false)
+  const trimRangeRef = useRef<TrimRange>({ start: trimStart, end: trimEnd })
+
+  useEffect(() => {
+    trimRangeRef.current = { start: trimStart, end: trimEnd }
+  }, [trimEnd, trimStart])
 
   const seek = useCallback(
-    (time: number) => {
+    (time: number, trimRange?: TrimRange) => {
       const video = videoRef.current
       if (!video || !Number.isFinite(time)) {
         return
+      }
+
+      if (trimRange) {
+        trimRangeRef.current = trimRange
       }
 
       const clamped = Math.min(
@@ -39,12 +52,12 @@ export function useVideoControls(
       return
     }
 
-    if (video.currentTime < trimStart || video.currentTime >= trimEnd) {
-      video.currentTime = trimStart
-      setCurrentTime(trimStart)
-    }
+    const { start, end } = trimRangeRef.current
 
-    loopRef.current = true
+    if (video.currentTime < start || video.currentTime >= end) {
+      video.currentTime = start
+      setCurrentTime(start)
+    }
 
     try {
       await video.play()
@@ -52,7 +65,7 @@ export function useVideoControls(
     } catch {
       setIsPlaying(false)
     }
-  }, [trimEnd, trimStart, videoRef])
+  }, [videoRef])
 
   const pause = useCallback(() => {
     const video = videoRef.current
@@ -60,7 +73,6 @@ export function useVideoControls(
       return
     }
 
-    loopRef.current = false
     video.pause()
     setIsPlaying(false)
   }, [videoRef])
@@ -76,7 +88,6 @@ export function useVideoControls(
 
   useEffect(() => {
     if (!src) {
-      loopRef.current = false
       return
     }
 
@@ -93,23 +104,42 @@ export function useVideoControls(
 
     const onPlay = () => setIsPlaying(true)
     const onPause = () => setIsPlaying(false)
-    const onTimeUpdate = () => setCurrentTime(video.currentTime)
+    const stopAtTrimEnd = () => {
+      const { start, end } = trimRangeRef.current
+
+      if (end <= start || video.currentTime < end) {
+        return
+      }
+
+      video.currentTime = end
+      setCurrentTime(end)
+      video.pause()
+      setIsPlaying(false)
+    }
+
+    const onTimeUpdate = () => {
+      setCurrentTime(video.currentTime)
+      stopAtTrimEnd()
+    }
+
+    let isActive = true
+    let frameCallbackId: number | null = null
+
+    const scheduleFrame = () => {
+      if ('requestVideoFrameCallback' in video) {
+        frameCallbackId = video.requestVideoFrameCallback(onFrame)
+      }
+    }
 
     const onFrame = () => {
+      if (!isActive) {
+        return
+      }
+
       setCurrentTime(video.currentTime)
+      stopAtTrimEnd()
 
-      if (
-        loopRef.current &&
-        trimEnd > trimStart &&
-        video.currentTime >= trimEnd - 0.05
-      ) {
-        video.currentTime = trimStart
-        setCurrentTime(trimStart)
-      }
-
-      if ('requestVideoFrameCallback' in video) {
-        video.requestVideoFrameCallback(onFrame)
-      }
+      scheduleFrame()
     }
 
     syncDuration()
@@ -119,19 +149,21 @@ export function useVideoControls(
     video.addEventListener('pause', onPause)
     video.addEventListener('timeupdate', onTimeUpdate)
 
-    if ('requestVideoFrameCallback' in video) {
-      video.requestVideoFrameCallback(onFrame)
-    }
+    scheduleFrame()
 
     return () => {
-      loopRef.current = false
+      isActive = false
+      if (frameCallbackId !== null && 'cancelVideoFrameCallback' in video) {
+        video.cancelVideoFrameCallback(frameCallbackId)
+      }
+
       video.removeEventListener('loadedmetadata', syncDuration)
       video.removeEventListener('durationchange', syncDuration)
       video.removeEventListener('play', onPlay)
       video.removeEventListener('pause', onPause)
       video.removeEventListener('timeupdate', onTimeUpdate)
     }
-  }, [src, trimEnd, trimStart, videoRef])
+  }, [src, videoRef])
 
   return {
     duration,
