@@ -6,19 +6,24 @@ import styles from './VideoPlayer.module.css'
 
 type VideoPlayerProps = {
   src: string
+  ariaLabel: string
   onTogglePlay: () => void
   onError?: () => void
   onLoadedMetadata?: () => void
 }
 
 export const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
-  function VideoPlayer({ src, onTogglePlay, onError, onLoadedMetadata }, ref) {
+  function VideoPlayer(
+    { src, ariaLabel, onTogglePlay, onError, onLoadedMetadata },
+    ref,
+  ) {
     return (
       <div className={styles.wrapper}>
         <video
           ref={ref}
           className={styles.video}
           src={src}
+          aria-label={ariaLabel}
           playsInline
           preload="metadata"
           tabIndex={0}

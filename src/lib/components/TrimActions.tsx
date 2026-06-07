@@ -4,9 +4,18 @@ type TrimActionsProps = {
   canTrim: boolean
   onTrim: () => void
   onCancel?: () => void
+  labels: {
+    trim: string
+    cancel: string
+  }
 }
 
-export function TrimActions({ canTrim, onTrim, onCancel }: TrimActionsProps) {
+export function TrimActions({
+  canTrim,
+  onTrim,
+  onCancel,
+  labels,
+}: TrimActionsProps) {
   return (
     <div className={styles.actions}>
       <button
@@ -20,7 +29,7 @@ export function TrimActions({ canTrim, onTrim, onCancel }: TrimActionsProps) {
           }
         }}
       >
-        Trim
+        {labels.trim}
       </button>
       {onCancel ? (
         <button
@@ -31,7 +40,7 @@ export function TrimActions({ canTrim, onTrim, onCancel }: TrimActionsProps) {
             onCancel()
           }}
         >
-          Cancel
+          {labels.cancel}
         </button>
       ) : null}
     </div>

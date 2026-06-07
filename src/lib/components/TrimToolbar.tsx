@@ -1,5 +1,6 @@
 import type { KeyboardEvent } from 'react'
 
+import type { VideoTrimLabels } from '../labels'
 import { isSpaceKey } from '../utils'
 import { FilmstripTrack } from './FilmstripTrack'
 import { PlayButton } from './PlayButton'
@@ -21,6 +22,7 @@ type TrimToolbarProps = {
   onEndChange: (time: number) => void
   onTrim: () => void
   onCancel?: () => void
+  labels: VideoTrimLabels
 }
 
 export function TrimToolbar({
@@ -37,6 +39,7 @@ export function TrimToolbar({
   onEndChange,
   onTrim,
   onCancel,
+  labels,
 }: TrimToolbarProps) {
   const handleToolbarKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) {
@@ -55,11 +58,15 @@ export function TrimToolbar({
     <div
       className={styles.toolbar}
       role="group"
-      aria-label="Video trim controls"
+      aria-label={labels.toolbar.ariaLabel}
       tabIndex={0}
       onKeyDown={handleToolbarKeyDown}
     >
-      <PlayButton isPlaying={isPlaying} onToggle={onTogglePlay} />
+      <PlayButton
+        isPlaying={isPlaying}
+        onToggle={onTogglePlay}
+        labels={labels.playback}
+      />
       <div className={styles.trackArea}>
         <FilmstripTrack
           src={src}
@@ -70,9 +77,15 @@ export function TrimToolbar({
           onSeek={onSeek}
           onStartChange={onStartChange}
           onEndChange={onEndChange}
+          labels={labels.filmstrip}
         />
       </div>
-      <TrimActions canTrim={canTrim} onTrim={onTrim} onCancel={onCancel} />
+      <TrimActions
+        canTrim={canTrim}
+        onTrim={onTrim}
+        onCancel={onCancel}
+        labels={labels.actions}
+      />
     </div>
   )
 }

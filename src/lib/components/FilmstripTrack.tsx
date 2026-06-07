@@ -21,6 +21,9 @@ type FilmstripTrackProps = {
   onSeek: (time: number) => void
   onStartChange: (time: number) => void
   onEndChange: (time: number) => void
+  labels: {
+    loadingFrames: (progress: { loaded: number; total: number }) => string
+  }
 }
 
 function formatPreviewTime(time: number) {
@@ -42,6 +45,7 @@ export function FilmstripTrack({
   onSeek,
   onStartChange,
   onEndChange,
+  labels,
 }: FilmstripTrackProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [trackWidth, setTrackWidth] = useState(0)
@@ -251,9 +255,7 @@ export function FilmstripTrack({
         </div>
 
         {isLoading ? (
-          <div className={styles.loading}>
-            Loading frames {progress.loaded}/{progress.total}
-          </div>
+          <div className={styles.loading}>{labels.loadingFrames(progress)}</div>
         ) : null}
 
         <span className={styles.trackTime} aria-hidden="true">

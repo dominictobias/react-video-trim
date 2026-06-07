@@ -5,19 +5,23 @@ import { VideoPlayer } from './components/VideoPlayer'
 import { useTrimSelection } from './hooks/useTrimSelection'
 import { useVideoControls } from './hooks/useVideoControls'
 import { useVideoMetadata } from './hooks/useVideoMetadata'
+import { resolveVideoTrimLabels } from './labels'
 import type { VideoTrimProps } from './types'
 import { useVideoObjectUrl } from './useVideoObjectUrl'
 
 import styles from './VideoTrim.module.css'
 
-function getVideoErrorMessage(video: HTMLVideoElement): string {
+function getVideoErrorMessage(
+  video: HTMLVideoElement,
+  labels: ReturnType<typeof resolveVideoTrimLabels>,
+): string {
   switch (video.error?.code) {
     case MediaError.MEDIA_ERR_DECODE:
-      return 'Unable to decode this video. Its codec may not be supported in this browser.'
+      return labels.errors.decode
     case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-      return 'This video format is not supported in this browser.'
+      return labels.errors.sourceNotSupported
     default:
-      return 'Unable to load this video.'
+      return labels.errors.load
   }
 }
 
@@ -25,12 +29,14 @@ export function VideoTrim({
   src,
   onTrim,
   onCancel,
+  labels,
   className,
   style,
 }: VideoTrimProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [error, setError] = useState<string | null>(null)
   const resolvedSrc = useVideoObjectUrl(src)
+  const resolvedLabels = useMemo(() => resolveVideoTrimLabels(labels), [labels])
 
   const { duration, isReady } = useVideoMetadata(videoRef, resolvedSrc)
   const { startTime, endTime, setStart, setEnd, hasChanges } = useTrimSelection(
@@ -101,8 +107,8 @@ export function VideoTrim({
       return
     }
 
-    setError(getVideoErrorMessage(video))
-  }, [resolvedSrc])
+    setError(getVideoErrorMessage(video, resolvedLabels))
+  }, [resolvedLabels, resolvedSrc])
 
   const handleVideoLoaded = useCallback(() => {
     setError(null)
@@ -123,6 +129,7 @@ export function VideoTrim({
         <VideoPlayer
           ref={videoRef}
           src={resolvedSrc}
+          ariaLabel={resolvedLabels.video.ariaLabel}
           onTogglePlay={togglePlay}
           onError={handleVideoError}
           onLoadedMetadata={handleVideoLoaded}
@@ -144,6 +151,7 @@ export function VideoTrim({
               onEndChange={handleEndChange}
               onTrim={handleTrim}
               onCancel={onCancel}
+              labels={resolvedLabels}
             />
           </div>
         ) : null}

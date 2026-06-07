@@ -43,13 +43,14 @@ import { createTrimHandler } from 'react-video-trim/plugins/webcodecs'
 
 ### `VideoTrim`
 
-| Prop        | Type                         | Required | Description                                                                         |
-| ----------- | ---------------------------- | -------- | ----------------------------------------------------------------------------------- |
-| `src`       | `string \| File \| Blob`     | Yes      | Video source URL, file, or blob.                                                    |
-| `onTrim`    | `(range: TrimRange) => void` | Yes      | Called when the user confirms a trim. Receives `{ startTime, endTime }` in seconds. |
-| `onCancel`  | `() => void`                 | No       | Called when the user cancels. Renders a Cancel button when provided.                |
-| `className` | `string`                     | No       | Applied to the root element.                                                        |
-| `style`     | `CSSProperties`              | No       | Inline styles for the root element.                                                 |
+| Prop        | Type                         | Required | Description                                                                                         |
+| ----------- | ---------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| `src`       | `string \| File \| Blob`     | Yes      | Video source URL, file, or blob.                                                                    |
+| `onTrim`    | `(range: TrimRange) => void` | Yes      | Called when the user confirms a trim. Receives `{ startTime, endTime }` in seconds.                 |
+| `onCancel`  | `() => void`                 | No       | Called when the user cancels. Renders a Cancel button when provided.                                |
+| `labels`    | `VideoTrimLabelsProp`        | No       | Overrides visible text, ARIA labels, loading copy, and video error messages. Uses English defaults. |
+| `className` | `string`                     | No       | Applied to the root element.                                                                        |
+| `style`     | `CSSProperties`              | No       | Inline styles for the root element.                                                                 |
 
 ### `TrimRange`
 
@@ -57,6 +58,43 @@ import { createTrimHandler } from 'react-video-trim/plugins/webcodecs'
 | ----------- | -------- | --------------------------- |
 | `startTime` | `number` | Trim start time in seconds. |
 | `endTime`   | `number` | Trim end time in seconds.   |
+
+### Labels
+
+`labels` accepts a partial object, so you only need to provide the text you want to replace. Missing values fall back to `defaultVideoTrimLabels`.
+
+```tsx
+import { VideoTrim, defaultVideoTrimLabels } from 'react-video-trim'
+
+;<VideoTrim
+  src={videoFile}
+  onTrim={setTrimRange}
+  labels={{
+    actions: {
+      trim: 'Guardar recorte',
+      cancel: 'Cancelar',
+    },
+    playback: {
+      play: 'Reproducir',
+      pause: 'Pausar',
+    },
+    video: {
+      ariaLabel: 'Vista previa del video',
+    },
+    toolbar: {
+      ariaLabel: 'Controles para recortar video',
+    },
+    filmstrip: {
+      loadingFrames: ({ loaded, total }) =>
+        `Cargando fotogramas ${loaded}/${total}`,
+    },
+    errors: {
+      ...defaultVideoTrimLabels.errors,
+      load: 'No se pudo cargar este video.',
+    },
+  }}
+/>
+```
 
 ## Example
 

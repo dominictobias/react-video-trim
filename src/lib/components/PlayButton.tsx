@@ -3,14 +3,18 @@ import styles from './PlayButton.module.css'
 type PlayButtonProps = {
   isPlaying: boolean
   onToggle: () => void
+  labels: {
+    play: string
+    pause: string
+  }
 }
 
-export function PlayButton({ isPlaying, onToggle }: PlayButtonProps) {
+export function PlayButton({ isPlaying, onToggle, labels }: PlayButtonProps) {
   return (
     <button
       type="button"
       className={styles.button}
-      aria-label={isPlaying ? 'Pause' : 'Play'}
+      aria-label={isPlaying ? labels.pause : labels.play}
       onPointerDown={(event) => {
         event.preventDefault()
         onToggle()
