@@ -2,7 +2,7 @@
 
 A React component for selecting trim ranges on a video with a filmstrip timeline.
 
-<img width="933" height="535" alt="Screenshot 2026-06-07 at 00 51 26" src="https://github.com/user-attachments/assets/dd31278d-c108-4284-b885-730a97039fab" />
+<img width="917" height="519" alt="demo" src="https://github.com/user-attachments/assets/2928033b-830f-4f25-835a-1b6cb3c912ed" />
 
 The core library reports the selected `{ startTime, endTime }` range. The included WebCodecs plugin can turn that range into a trimmed video file in the browser.
 
