@@ -47,7 +47,7 @@ import { createTrimHandler } from 'react-video-trim/plugins/webcodecs'
 | ----------- | ---------------------------- | -------- | ----------------------------------------------------------------------------------- |
 | `src`       | `string \| File \| Blob`     | Yes      | Video source URL, file, or blob.                                                    |
 | `onTrim`    | `(range: TrimRange) => void` | Yes      | Called when the user confirms a trim. Receives `{ startTime, endTime }` in seconds. |
-| `onCancel`  | `() => void`                 | No       | Called when the user cancels.                                                       |
+| `onCancel`  | `() => void`                 | No       | Called when the user cancels. Renders a Cancel button when provided.                 |
 | `className` | `string`                     | No       | Applied to the root element.                                                        |
 | `style`     | `CSSProperties`              | No       | Inline styles for the root element.                                                 |
 
@@ -82,7 +82,6 @@ export function App() {
         <VideoCrop
           src={videoFile}
           onTrim={setTrimRange}
-          onCancel={() => setTrimRange(null)}
         />
       ) : null}
 

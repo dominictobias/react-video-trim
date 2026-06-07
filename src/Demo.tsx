@@ -117,11 +117,6 @@ export function Demo() {
           onTrim={(range: TrimRange) => {
             void handleTrim(range)
           }}
-          onCancel={() => {
-            setTrimResult(null)
-            setTrimProgress(null)
-            setTrimError(null)
-          }}
         />
       ) : (
         <p className="demo-placeholder">

@@ -8,11 +8,9 @@
   --vc-handle-gutter-bg: var(--vc-toolbar-bg);
   --vc-handle-line-bg: rgba(0, 0, 0, 0.45);
   --vc-button-bg: rgba(255, 255, 255, 0.1);
-  --vc-button-bg-hover: #353b48;
-  --vc-button-disabled-bg: #22262e;
+  --vc-button-bg-hover: rgba(255, 255, 255, 0.15);
   --vc-text: #ffffff;
   --vc-text-muted: #8b919a;
-  --vc-text-disabled: #555a63;
   --vc-error-bg: #3a1f1f;
   --vc-error-text: #ffb4b4;
   --vc-dim-overlay: rgba(0, 0, 0, 0.55);

@@ -26,8 +26,7 @@
 }
 
 .button:disabled {
-  background: var(--vc-button-disabled-bg);
-  color: var(--vc-text-disabled);
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
