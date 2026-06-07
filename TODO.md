@@ -1,1 +1,2 @@
 - Add Split Clip like QuickTime has
+- Props for i18n labels etc

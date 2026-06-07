@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import type { VideoCropProps } from './types'
+import type { VideoTrimProps } from './types'
 
-export function useVideoObjectUrl(src: VideoCropProps['src']): string | null {
+export function useVideoObjectUrl(src: VideoTrimProps['src']): string | null {
   const [blobUrl, setBlobUrl] = useState<string | null>(null)
 
   useEffect(() => {
@@ -25,8 +25,4 @@ export function useVideoObjectUrl(src: VideoCropProps['src']): string | null {
   }
 
   return blobUrl
-}
-
-export function isRemoteVideoSrc(src: string): boolean {
-  return /^https?:\/\//.test(src)
 }

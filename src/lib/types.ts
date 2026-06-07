@@ -5,7 +5,7 @@ export type TrimRange = {
   endTime: number
 }
 
-export type VideoCropProps = {
+export type VideoTrimProps = {
   src: string | File | Blob
   onTrim: (range: TrimRange) => void
   onCancel?: () => void

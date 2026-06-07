@@ -21,7 +21,6 @@ type FilmstripTrackProps = {
   onSeek: (time: number) => void
   onStartChange: (time: number) => void
   onEndChange: (time: number) => void
-  onTrackWidthChange: (width: number) => void
 }
 
 function formatPreviewTime(time: number) {
@@ -43,7 +42,6 @@ export function FilmstripTrack({
   onSeek,
   onStartChange,
   onEndChange,
-  onTrackWidthChange,
 }: FilmstripTrackProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [trackWidth, setTrackWidth] = useState(0)
@@ -76,9 +74,7 @@ export function FilmstripTrack({
     }
 
     const updateWidth = () => {
-      const width = track.clientWidth
-      setTrackWidth(width)
-      onTrackWidthChange(width)
+      setTrackWidth(track.clientWidth)
     }
 
     updateWidth()
@@ -87,7 +83,7 @@ export function FilmstripTrack({
     observer.observe(track)
 
     return () => observer.disconnect()
-  }, [onTrackWidthChange])
+  }, [])
 
   const clientXToTrackPx = useCallback((clientX: number) => {
     const track = trackRef.current

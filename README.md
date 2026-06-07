@@ -29,7 +29,7 @@ This package ships as ESM only. Use it with Vite, Next.js, webpack, or any moder
 Import the component and its styles:
 
 ```tsx
-import { VideoCrop } from 'react-video-trim'
+import { VideoTrim } from 'react-video-trim'
 import 'react-video-trim/style.css'
 ```
 
@@ -41,13 +41,13 @@ import { createTrimHandler } from 'react-video-trim/plugins/webcodecs'
 
 ## Props
 
-### `VideoCrop`
+### `VideoTrim`
 
 | Prop        | Type                         | Required | Description                                                                         |
 | ----------- | ---------------------------- | -------- | ----------------------------------------------------------------------------------- |
 | `src`       | `string \| File \| Blob`     | Yes      | Video source URL, file, or blob.                                                    |
 | `onTrim`    | `(range: TrimRange) => void` | Yes      | Called when the user confirms a trim. Receives `{ startTime, endTime }` in seconds. |
-| `onCancel`  | `() => void`                 | No       | Called when the user cancels. Renders a Cancel button when provided.                 |
+| `onCancel`  | `() => void`                 | No       | Called when the user cancels. Renders a Cancel button when provided.                |
 | `className` | `string`                     | No       | Applied to the root element.                                                        |
 | `style`     | `CSSProperties`              | No       | Inline styles for the root element.                                                 |
 
@@ -62,7 +62,7 @@ import { createTrimHandler } from 'react-video-trim/plugins/webcodecs'
 
 ```tsx
 import { useState } from 'react'
-import { VideoCrop } from 'react-video-trim'
+import { VideoTrim } from 'react-video-trim'
 import type { TrimRange } from 'react-video-trim'
 import 'react-video-trim/style.css'
 
@@ -78,12 +78,7 @@ export function App() {
         onChange={(event) => setVideoFile(event.target.files?.[0] ?? null)}
       />
 
-      {videoFile ? (
-        <VideoCrop
-          src={videoFile}
-          onTrim={setTrimRange}
-        />
-      ) : null}
+      {videoFile ? <VideoTrim src={videoFile} onTrim={setTrimRange} /> : null}
 
       {trimRange ? <pre>{JSON.stringify(trimRange, null, 2)}</pre> : null}
     </div>
@@ -97,7 +92,7 @@ Use `createTrimHandler` as an `onTrim` adapter when you want WebCodecs to produc
 
 ```tsx
 import { useMemo, useState } from 'react'
-import { VideoCrop } from 'react-video-trim'
+import { VideoTrim } from 'react-video-trim'
 import {
   type TrimVideoResult,
   createTrimHandler,
@@ -125,7 +120,7 @@ export function App() {
   if (!videoFile || !onTrim) return null
 
   return (
-    <VideoCrop
+    <VideoTrim
       src={videoFile}
       onTrim={(range) => {
         void onTrim(range)

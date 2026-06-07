@@ -1,5 +1,7 @@
 import { useRef } from 'react'
 
+import { usePointerDrag } from '../hooks/usePointerDrag'
+
 import styles from './TrimHandle.module.css'
 
 type TrimHandleProps = {
@@ -17,43 +19,24 @@ export function TrimHandle({
   onDragStart,
   onDragEnd,
 }: TrimHandleProps) {
-  const draggingRef = useRef(false)
   const dragOffsetRef = useRef(0)
+
+  const dragHandlers = usePointerDrag({
+    onDragStart: (event) => {
+      const rect = event.currentTarget.getBoundingClientRect()
+      const boundaryX = side === 'left' ? rect.right : rect.left
+      dragOffsetRef.current = event.clientX - boundaryX
+      onDragStart?.()
+    },
+    onDragMove: (event) => onDrag(event.clientX - dragOffsetRef.current),
+    onDragEnd,
+  })
 
   return (
     <div
       className={side === 'left' ? styles.left : styles.right}
       style={{ left: `${position}px` }}
-      onPointerDown={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        draggingRef.current = true
-        const rect = event.currentTarget.getBoundingClientRect()
-        const boundaryX = side === 'left' ? rect.right : rect.left
-        dragOffsetRef.current = event.clientX - boundaryX
-        event.currentTarget.setPointerCapture(event.pointerId)
-        onDragStart?.()
-      }}
-      onPointerMove={(event) => {
-        if (!draggingRef.current) {
-          return
-        }
-
-        event.stopPropagation()
-        onDrag(event.clientX - dragOffsetRef.current)
-      }}
-      onPointerUp={(event) => {
-        event.stopPropagation()
-        draggingRef.current = false
-        event.currentTarget.releasePointerCapture(event.pointerId)
-        onDragEnd?.()
-      }}
-      onPointerCancel={(event) => {
-        event.stopPropagation()
-        draggingRef.current = false
-        event.currentTarget.releasePointerCapture(event.pointerId)
-        onDragEnd?.()
-      }}
+      {...dragHandlers}
     >
       <div className={styles.grip}>
         <div className={styles.lines}>

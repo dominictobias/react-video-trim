@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { CropToolbar } from './components/CropToolbar'
+import { TrimToolbar } from './components/TrimToolbar'
 import { VideoPlayer } from './components/VideoPlayer'
-import { MIN_TRIM_DURATION } from './constants'
 import { useTrimSelection } from './hooks/useTrimSelection'
 import { useVideoControls } from './hooks/useVideoControls'
 import { useVideoMetadata } from './hooks/useVideoMetadata'
-import type { VideoCropProps } from './types'
+import type { VideoTrimProps } from './types'
 import { useVideoObjectUrl } from './useVideoObjectUrl'
 
-import styles from './VideoCrop.module.css'
+import styles from './VideoTrim.module.css'
 
 function getVideoErrorMessage(video: HTMLVideoElement): string {
   switch (video.error?.code) {
@@ -22,15 +21,14 @@ function getVideoErrorMessage(video: HTMLVideoElement): string {
   }
 }
 
-export function VideoCrop({
+export function VideoTrim({
   src,
   onTrim,
   onCancel,
   className,
   style,
-}: VideoCropProps) {
+}: VideoTrimProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [trackWidth, setTrackWidth] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const resolvedSrc = useVideoObjectUrl(src)
 
@@ -38,7 +36,6 @@ export function VideoCrop({
   const { startTime, endTime, setStart, setEnd, hasChanges } = useTrimSelection(
     {
       duration,
-      trackWidth,
     },
   )
 
@@ -55,7 +52,7 @@ export function VideoCrop({
   )
 
   useEffect(() => {
-    if (!isReady) {
+    if (!isReady || isPlaying) {
       return
     }
 
@@ -67,18 +64,11 @@ export function VideoCrop({
     if (currentTime > endTime) {
       seekWithinTrim(endTime)
     }
-  }, [currentTime, endTime, isReady, seekWithinTrim, startTime])
-
-  const handleTrackWidthChange = useCallback((width: number) => {
-    setTrackWidth(width)
-  }, [])
+  }, [currentTime, endTime, isPlaying, isReady, seekWithinTrim, startTime])
 
   const handleStartChange = useCallback(
     (time: number) => {
-      const maxStart = Math.max(0, endTime - MIN_TRIM_DURATION)
-      const nextStart = Math.min(Math.max(time, 0), maxStart)
-
-      setStart(nextStart)
+      const nextStart = setStart(time)
       seek(nextStart, { start: nextStart, end: endTime })
     },
     [endTime, seek, setStart],
@@ -86,13 +76,10 @@ export function VideoCrop({
 
   const handleEndChange = useCallback(
     (time: number) => {
-      const minEnd = Math.min(duration, startTime + MIN_TRIM_DURATION)
-      const nextEnd = Math.min(Math.max(time, minEnd), duration)
-
-      setEnd(nextEnd)
+      const nextEnd = setEnd(time)
       seek(nextEnd, { start: startTime, end: nextEnd })
     },
-    [duration, seek, setEnd, startTime],
+    [seek, setEnd, startTime],
   )
 
   const handleTrim = useCallback(() => {
@@ -143,7 +130,7 @@ export function VideoCrop({
 
         {isReady && duration > 0 ? (
           <div className={styles.toolbarOverlay}>
-            <CropToolbar
+            <TrimToolbar
               src={resolvedSrc}
               duration={duration}
               currentTime={currentTime}
@@ -155,7 +142,6 @@ export function VideoCrop({
               onSeek={seekWithinTrim}
               onStartChange={handleStartChange}
               onEndChange={handleEndChange}
-              onTrackWidthChange={handleTrackWidthChange}
               onTrim={handleTrim}
               onCancel={onCancel}
             />

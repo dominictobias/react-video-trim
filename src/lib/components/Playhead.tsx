@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { usePointerDrag } from '../hooks/usePointerDrag'
 
 import styles from './Playhead.module.css'
 
@@ -15,39 +15,17 @@ export function Playhead({
   onDragStart,
   onDragEnd,
 }: PlayheadProps) {
-  const draggingRef = useRef(false)
+  const dragHandlers = usePointerDrag({
+    onDragStart,
+    onDragMove: (event) => onDrag(event.clientX),
+    onDragEnd,
+  })
 
   return (
     <div
       className={styles.playhead}
       style={{ left: `${position}px` }}
-      onPointerDown={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        draggingRef.current = true
-        event.currentTarget.setPointerCapture(event.pointerId)
-        onDragStart?.()
-      }}
-      onPointerMove={(event) => {
-        if (!draggingRef.current) {
-          return
-        }
-
-        event.stopPropagation()
-        onDrag(event.clientX)
-      }}
-      onPointerUp={(event) => {
-        event.stopPropagation()
-        draggingRef.current = false
-        event.currentTarget.releasePointerCapture(event.pointerId)
-        onDragEnd?.()
-      }}
-      onPointerCancel={(event) => {
-        event.stopPropagation()
-        draggingRef.current = false
-        event.currentTarget.releasePointerCapture(event.pointerId)
-        onDragEnd?.()
-      }}
+      {...dragHandlers}
     >
       <span className={styles.knob} />
     </div>

@@ -1,4 +1,6 @@
-import { type KeyboardEvent, forwardRef } from 'react'
+import { forwardRef } from 'react'
+
+import { isSpaceKey } from '../utils'
 
 import styles from './VideoPlayer.module.css'
 
@@ -7,10 +9,6 @@ type VideoPlayerProps = {
   onTogglePlay: () => void
   onError?: () => void
   onLoadedMetadata?: () => void
-}
-
-function isSpaceKey(event: KeyboardEvent) {
-  return event.key === ' ' || event.key === 'Spacebar' || event.code === 'Space'
 }
 
 export const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(

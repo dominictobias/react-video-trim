@@ -4,13 +4,9 @@ import { MIN_TRIM_DURATION } from '../constants'
 
 type UseTrimSelectionOptions = {
   duration: number
-  trackWidth: number
 }
 
-export function useTrimSelection({
-  duration,
-  trackWidth,
-}: UseTrimSelectionOptions) {
+export function useTrimSelection({ duration }: UseTrimSelectionOptions) {
   const [startRatio, setStartRatio] = useState(0)
   const [endRatio, setEndRatio] = useState(1)
   const [prevDuration, setPrevDuration] = useState(duration)
@@ -24,53 +20,32 @@ export function useTrimSelection({
   const startTime = startRatio * duration
   const endTime = endRatio * duration
 
-  const timeToPx = useCallback(
-    (time: number) => {
-      if (!duration || !trackWidth) {
-        return 0
-      }
-
-      return (time / duration) * trackWidth
-    },
-    [duration, trackWidth],
-  )
-
-  const pxToTime = useCallback(
-    (px: number) => {
-      if (!duration || !trackWidth) {
-        return 0
-      }
-
-      const ratio = Math.min(Math.max(px / trackWidth, 0), 1)
-      return ratio * duration
-    },
-    [duration, trackWidth],
-  )
-
   const setStart = useCallback(
-    (time: number) => {
+    (time: number): number => {
       if (!duration) {
-        return
+        return startTime
       }
 
       const maxStart = Math.max(0, endTime - MIN_TRIM_DURATION)
       const clamped = Math.min(Math.max(time, 0), maxStart)
       setStartRatio(clamped / duration)
+      return clamped
     },
-    [duration, endTime],
+    [duration, endTime, startTime],
   )
 
   const setEnd = useCallback(
-    (time: number) => {
+    (time: number): number => {
       if (!duration) {
-        return
+        return endTime
       }
 
       const minEnd = Math.min(duration, startTime + MIN_TRIM_DURATION)
       const clamped = Math.min(Math.max(time, minEnd), duration)
       setEndRatio(clamped / duration)
+      return clamped
     },
-    [duration, startTime],
+    [duration, startTime, endTime],
   )
 
   const hasChanges = duration > 0 && (startRatio > 0.001 || endRatio < 0.999)
@@ -80,8 +55,6 @@ export function useTrimSelection({
     endTime,
     setStart,
     setEnd,
-    timeToPx,
-    pxToTime,
     hasChanges,
   }
 }

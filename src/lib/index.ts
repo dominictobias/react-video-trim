@@ -1,2 +1,2 @@
-export { VideoCrop } from './VideoCrop'
-export type { TrimRange, VideoCropProps } from './types'
+export { VideoTrim } from './VideoTrim'
+export type { TrimRange, VideoTrimProps } from './types'

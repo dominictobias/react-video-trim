@@ -1,7 +1,7 @@
 {
   "name": "react-video-trim",
   "private": false,
-  "version": "0.1.3",
+  "version": "0.2.0",
   "author": "Dominic Tobias",
   "type": "module",
   "keywords": [
@@ -9,7 +9,6 @@
     "video",
     "video-editor",
     "video-trim",
-    "video-crop",
     "video-player",
     "webcodecs"
   ],

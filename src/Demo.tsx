@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { VideoCrop } from './lib'
+import { VideoTrim } from './lib'
 import type { TrimRange } from './lib'
 
 import './demo.css'
@@ -111,7 +111,7 @@ export function Demo() {
       </header>
 
       {videoSrc && handleTrim ? (
-        <VideoCrop
+        <VideoTrim
           key={`${videoSrc.name}-${videoSrc.size}-${videoSrc.lastModified}`}
           src={videoSrc}
           onTrim={(range: TrimRange) => {

@@ -57,8 +57,8 @@ export function useFilmstrip({
       duration,
       thumbCount,
       signal: abortController.signal,
-      onFrame: (index, bitmap) => {
-        drawFilmstripFrame(ctx, index, bitmap, THUMB_WIDTH, trackHeight)
+      onFrame: (index, frame) => {
+        drawFilmstripFrame(ctx, index, frame, THUMB_WIDTH, trackHeight)
       },
       onProgress: (loaded, total) => {
         setProgress({ loaded, total })

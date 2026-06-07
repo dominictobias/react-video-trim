@@ -96,9 +96,9 @@ function getOutputMimeType(format: OutputFormat, override?: string): string {
 function getConversionErrorMessage(
   conversion: Awaited<ReturnType<typeof Conversion.init>>,
 ): string {
-  const reasons = conversion.discardedTracks
-    .map(({ reason }) => reason)
-    .filter((reason, index, allReasons) => allReasons.indexOf(reason) === index)
+  const reasons = [
+    ...new Set(conversion.discardedTracks.map(({ reason }) => reason)),
+  ]
 
   if (reasons.length === 0) {
     return 'Mediabunny cannot trim this file with the current browser codecs.'

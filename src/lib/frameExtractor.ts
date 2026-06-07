@@ -1,3 +1,7 @@
+import { isRemoteVideoSrc } from './utils'
+
+const SEEK_TIMEOUT_MS = 5000
+
 export type FrameExtractorOptions = {
   src: string
   duration: number
@@ -71,6 +75,35 @@ function waitForCurrentFrame(
   return waitForEvent(video, 'loadeddata', signal)
 }
 
+function waitForEventWithTimeout(
+  target: EventTarget,
+  eventName: string,
+  signal: AbortSignal,
+  timeoutMs: number,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let timeoutId: number | null = null
+
+    const settle = (action: () => void) => {
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId)
+      }
+      action()
+    }
+
+    timeoutId = window.setTimeout(() => {
+      // Some browsers occasionally never fire `seeked`; resolve so a single
+      // stuck seek can't freeze the whole extraction loop.
+      resolve()
+    }, timeoutMs)
+
+    waitForEvent(target, eventName, signal).then(
+      () => settle(resolve),
+      (error: unknown) => settle(() => reject(error)),
+    )
+  })
+}
+
 function seekVideo(
   video: HTMLVideoElement,
   time: number,
@@ -81,7 +114,27 @@ function seekVideo(
   }
 
   video.currentTime = time
-  return waitForEvent(video, 'seeked', signal)
+  return waitForEventWithTimeout(video, 'seeked', signal, SEEK_TIMEOUT_MS)
+}
+
+function createExtractionVideo(src: string): HTMLVideoElement {
+  const video = document.createElement('video')
+  video.preload = 'auto'
+  video.muted = true
+  video.playsInline = true
+
+  if (isRemoteVideoSrc(src)) {
+    video.crossOrigin = 'anonymous'
+  }
+
+  video.src = src
+
+  return video
+}
+
+function releaseExtractionVideo(video: HTMLVideoElement): void {
+  video.removeAttribute('src')
+  video.load()
 }
 
 function getFrameSize(frame: HTMLVideoElement) {
@@ -135,16 +188,7 @@ export async function extractFrames({
   onFrame,
   onProgress,
 }: FrameExtractorOptions): Promise<void> {
-  const video = document.createElement('video')
-  video.preload = 'auto'
-  video.muted = true
-  video.playsInline = true
-
-  if (/^https?:\/\//.test(src)) {
-    video.crossOrigin = 'anonymous'
-  }
-
-  video.src = src
+  const video = createExtractionVideo(src)
 
   try {
     await waitForMetadata(video, signal)
@@ -170,8 +214,7 @@ export async function extractFrames({
       onProgress?.(index + 1, count)
     }
   } finally {
-    video.removeAttribute('src')
-    video.load()
+    releaseExtractionVideo(video)
   }
 }
 
@@ -181,16 +224,7 @@ export async function extractFrameAtTime({
   signal,
   onFrame,
 }: FrameExtractorFrameOptions): Promise<void> {
-  const video = document.createElement('video')
-  video.preload = 'auto'
-  video.muted = true
-  video.playsInline = true
-
-  if (/^https?:\/\//.test(src)) {
-    video.crossOrigin = 'anonymous'
-  }
-
-  video.src = src
+  const video = createExtractionVideo(src)
 
   try {
     await waitForMetadata(video, signal)
@@ -199,7 +233,6 @@ export async function extractFrameAtTime({
 
     onFrame(video)
   } finally {
-    video.removeAttribute('src')
-    video.load()
+    releaseExtractionVideo(video)
   }
 }
