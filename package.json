@@ -1,6 +1,6 @@
 {
   "name": "react-video-trim",
-  "private": true,
+  "private": false,
   "version": "0.1.0",
   "type": "module",
   "files": [
@@ -14,9 +14,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && vite build --config vite.plugin.config.ts",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "prepublishOnly": "bun run build",
     "preview": "vite preview"
   },
   "dependencies": {

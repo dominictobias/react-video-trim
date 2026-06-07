@@ -19,9 +19,16 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     lib: {
-      entry: resolve(import.meta.dirname, 'src/lib/index.ts'),
+      entry: {
+        'react-video-trim': resolve(import.meta.dirname, 'src/lib/index.ts'),
+        'plugins/webcodecs': resolve(
+          import.meta.dirname,
+          'src/lib/plugins/webcodecs.ts',
+        ),
+      },
       formats: ['es'],
-      fileName: () => 'react-video-trim.js',
+      fileName: (_format, entryName) => `${entryName}.js`,
+      cssFileName: 'react-video-trim',
     },
     rolldownOptions: {
       external: (id: string) =>
