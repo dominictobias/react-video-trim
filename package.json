@@ -2,7 +2,25 @@
   "name": "react-video-trim",
   "private": false,
   "version": "0.1.0",
+  "author": "Dominic Tobias",
   "type": "module",
+  "keywords": [
+    "react",
+    "video",
+    "video-editor",
+    "video-trim",
+    "video-crop",
+    "video-player",
+    "webcodecs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dominictobias/react-video-trim.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dominictobias/react-video-trim/issues"
+  },
+  "homepage": "https://github.com/dominictobias/react-video-trim#readme",
   "files": [
     "dist"
   ],
