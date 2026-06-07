@@ -5,7 +5,6 @@
   --vc-toolbar-overlay-border-color: rgba(255, 255, 255, 0.06);
   --vc-toolbar-shadow-color: rgba(0, 0, 0, 0.32);
   --vc-track-bg: #0f1115;
-  --vc-handle-gutter-bg: var(--vc-toolbar-bg);
   --vc-handle-line-bg: rgba(0, 0, 0, 0.45);
   --vc-button-bg: rgba(255, 255, 255, 0.1);
   --vc-button-bg-hover: rgba(255, 255, 255, 0.15);
